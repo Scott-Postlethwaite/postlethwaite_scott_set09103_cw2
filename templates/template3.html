@@ -1,0 +1,35 @@
+<!doctype html>
+
+<body>
+<div class="center">
+		<div id="notBody">
+		<div id="notBody">
+<div class = "posts">
+<p class = "center">
+	 <h1 class = "center">{{title}}</h1>
+	<div class = "center">
+	{% for result in results %}
+		<h3><a href="/year/?year={{result}}">{{result}}</a></h3>
+	{% endfor %}
+</div>    
+ </p>
+</div>
+</div>
+	</body>
+	<div id="dropdown">
+	<div id="logo"><img src="{{image}}"style="width:120px;height:120px;"/></div>
+	<div id="hiddenMenu">
+	<ul>
+		<li id="write"><h3><a href="/home">Home</a></h3> </li>
+		<li id="delete"><h3><a href="/year">Years</a></h3> </li>
+		<li id="edit2"><h3><a href="/country">Countries</a></h3> </li>
+		 <li id="edit2"><h3><a href="/all">All</a></h3> </li>
+		 <li id="edit2"><h3><a href="/upload">Upload</a></h3> </li>
+
+	</ul>
+	</div>
+	</div>
+</html> 
+	<link rel = "stylesheet" type="text/css" href="{{csssheet}}" >
+
+</html>

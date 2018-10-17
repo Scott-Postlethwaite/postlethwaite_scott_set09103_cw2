@@ -1,0 +1,40 @@
+<!doctype html>
+
+<body>
+<div>
+
+	<div class = "center">
+	<div id ="notBody">
+	{% for result in results %}		
+		<div id="notBody">
+		<div class = "posts">
+		 <h1 class = "center">The {{result["name"]}} Incident</h1>
+		<div><img src="{{result["img"]}}"style="width:380px;height:240px;"/></div>
+		<div><a href='/year/?year={{result["year"]}}'>{{result["year"]}}</a></div>
+		<div><a href='/country/?country={{result["country"]}}'>{{result["country"]}}</a></div>
+		<div>{{result["description"]}}</div>
+		</div>
+		</div>
+	{% endfor %}
+</div>    
+</div>
+</div>
+</div>
+	</body>
+	<div id="dropdown">
+	<div id="logo"><img src="{{image}}"style="width:120px;height:120px;"/></div>
+	<div id="hiddenMenu">
+	<ul>
+		<li id="write"><h3><a href="/home">Home</a></h3> </li>
+		<li id="delete"><h3><a href="/year">Years</a></h3> </li>
+		<li id="edit2"><h3><a href="/country">Countries</a></h3> </li>
+		 <li id="edit2"><h3><a href="/all">All</a></h3> </li>
+		 <li id="edit2"><h3><a href="/upload">Upload</a></h3> </li>
+
+	</ul>
+	</div>
+	</div>
+</html> 
+	<link rel = "stylesheet" type="text/css" href="{{csssheet}}" >
+
+</html>
