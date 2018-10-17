@@ -2,7 +2,6 @@
 import os
 from flask import Flask, Markup, request, render_template, redirect, json, url_for, jsonify, Response
 #importing the film class
-from film import Film
 from sighting import Sighting
 #from flask import Flask, request, redirect, json, url_for, jsonify, Response
 #
