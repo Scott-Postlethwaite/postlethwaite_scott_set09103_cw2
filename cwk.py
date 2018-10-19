@@ -1,10 +1,7 @@
 # coding: utf-8
 import os
 from flask import Flask, Markup, request, render_template, redirect, json, url_for, jsonify, Response
-#importing the film class
 from sighting import Sighting
-#from flask import Flask, request, redirect, json, url_for, jsonify, Response
-#
 app = Flask(__name__)
 
 SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
@@ -67,7 +64,7 @@ def home():
 
 		return render_template('templateex.html', csssheet = url, image = image)
 
-
+#this allows the user to report their own sighting. They also have the option of adding an image.
 @app.route("/upload/",methods=['POST','GET'])
 def upload():
 
@@ -125,6 +122,7 @@ def upload():
 
 
 #stacking the routes makes them the same
+#this shows all years in which there are reported ufo sightings
 @app.route("/year/")
 @app.route("/Year/")
 def Year():
@@ -163,7 +161,7 @@ def Year():
 			return render_template('template2.html', title = result, csssheet = url, image = image)
 
 
-
+#this shows all countries in which ufo sightings have happened
 @app.route("/country/")
 @app.route("/Country/")
 def Country():
@@ -208,9 +206,8 @@ def Country():
 
 @app.route("/all/")
 @app.route("/All/")
-def AllFilms():
-#These are several attempts at importing data from a json file
-
+def All():
+#This lists all sightings saved in the directory
 	SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
 	json_url = os.path.join(SITE_ROOT, "static", "everything.json")
 	url = url_for('static',filename='csstest.css')
@@ -219,60 +216,6 @@ def AllFilms():
 	data = json.loads(ro.read())
 	results = data["sightings"]
 	return  render_template('template5.html', results = results, csssheet = url, image = image)
-
-
-
- #  start + url + end  
-
-
-#	data = json.loads(file)
-
-#	return data
-#json.dumps
-#json.loads
-
-#jsonify
-
-
-
-#	filename = os.path.join(app.static_folder, 'filmTest.json')
-#	with open(filename) as film_file:
-#		data = json.load(film_file)
-#		filmList=[]
-#		for film in data['films']:
-#			filmList.append(film)
-
-##		return filmList
-
-
-
-
-	#SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
-	#json_url = os.path.join(SITE_ROOT, "films/", "filmTest.json")
-	#json_data = json.load(open(json_url))	
-	
-	#try:
-	#	filmList = []
-#
-#		for i in range(0,5):
-#			film = Film(titles.get_title())
-#			filmList.append(film)
-#
-#		jsonStr = json.dumps([e.toJson() for e in filmList])
-#
-#	except:
-#		print "error ", sys.exc_info()[0]
-#
-#	return jsonStr
-
-
-
-
-
-
-
-
-
 
 
 
