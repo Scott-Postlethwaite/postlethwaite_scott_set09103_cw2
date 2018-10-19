@@ -49,9 +49,10 @@ def home():
 
 
 			if searched == False:
-				result = 'The page you requested does not exist. If you are having trouble finding things, try navigating using the alien head'
+				title = "I'm sorry we couldn't find that"
+				result = 'The page you requested does not exist. If you are having trouble finding things, try navigating using the alien head. If you think it should exist then add it using our new upload feature!'
 
-			return render_template('template2.html', title = result, csssheet = url, image = image)
+			return render_template('template2.html', title = title, result = result, csssheet = url, image = image)
 
 
 				
@@ -74,11 +75,13 @@ def upload():
 		Ysearch = False
 		Csearch = False
 		json_url = os.path.join(SITE_ROOT, "static", "everything.json")
-
-		f = request.files['datafile']
-		fname = f.filename
-		f.save(os.path.join(app.config['static'], fname))	
-		img = url_for('static',filename = fname)	
+		if 'datafile' not in request.files:
+			img = ''
+		else:
+			f = request.files['datafile']
+			fname = f.filename
+			f.save(os.path.join(app.config['static'], fname))	
+			img = url_for('static',filename = fname)	
 		name = request.form['uplName']
 		year = request.form['uplYear']
 		country = request.form['uplCountry']
@@ -285,9 +288,10 @@ def page_not_found(error):
 	
 	ro = open(json_url, "r")
 	data = json.loads(ro.read())
+	title = "I'm sorry we couldn't find that"
 	result = 'The page you requested does not exist. If you are having trouble finding things, try navigating using the alien head. If you think it should exist then add it using our new upload feature!'
 
-	return render_template('template2.html', title = result, csssheet = url, image = image)
+	return render_template('template2.html', title = title, result = result, csssheet = url, image = image)
 
 
 if __name__ == "__main__":

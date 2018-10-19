@@ -2,6 +2,12 @@ body{
 	background-color:rgba(0,0,0,.03);
 }
 
+ul {
+	list-style-type:none;
+	margin:auto;
+}
+
+
 .posts
 {
 	border:solid 2px rgba(0,0,0,.07);
@@ -12,7 +18,7 @@ body{
 
 #title
 {
-	color:#1d19d6;
+	color:#000000;
 	text-align: center;
 }
 
@@ -57,12 +63,12 @@ body{
 
 
 a:link{
-    color:#1d19d6;
+    color:#000000;
 	text-decoration: none;
 }
 
 a:visited {
-    color:#1d19d6;
+    color:#000000;
 	text-decoration: none;
 }
 
