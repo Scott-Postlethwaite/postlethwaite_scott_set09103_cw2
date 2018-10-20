@@ -25,16 +25,18 @@ def home():
 			urltype = "year"
 			
 			for sighting in data["sightings"]:
-				if sighting["name"] == name:
+				name1 = sighting["name"]
+				country = sighting["country"]
+
+				if name.upper() == name1.upper():
 					searched = True
 					results.append(sighting)
-
 
 				if sighting["year"] ==name:
 					searched = True
 					results.append(sighting)
 
-				if sighting["country"] == name:
+				if country.upper() == name.upper():
 					searched = True
 					results.append(sighting)
 	
