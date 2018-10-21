@@ -394,6 +394,91 @@ def page_not_found(error):
 
 
 
+@app.route("/help")
+def Help():
+
+        url = url_for('static',filename='csstest.css')
+        image = url_for('static',filename='logo1.png')
+        SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
+        json_url = os.path.join(SITE_ROOT, "static", "everything.json")
+
+        ro = open(json_url, "r")
+        data = json.loads(ro.read())
+        title = "Navigation Tips"
+        result = "The menu is hidden under the alien head. Just hover your mouse over it and the menu will appear. You can search for sightings by name, year or country of origin using our search feature or you can display all. If you would like to report a sighting you can by registering an account with us and using our upload feature!"
+
+        return render_template('template2.html', title = title, result = result, csssheet = url, image = image)
+
+#@app.route("/Delete/")
+#def Delete():
+#	print CURRENT_USER
+#	searched = False
+#	year = request.args.get('name', '')
+#	if CURRENT_USER == '40281026':
+#		SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
+#		json_url = os.path.join(SITE_ROOT, "static", "everything.json")
+#		url = url_for('static',filename='csstest.css')
+#		image = url_for('static',filename='logo1.png')
+#		ro = open(json_url, "r")
+#		data = json.loads(ro.read())
+#		for sighting in data["sightings"]:
+#			if sighting["name"] == name:
+#				print 'found it'
+#		if searched == True:
+#			results.sort()
+#			return redirect('/home/')
+#	else:
+#		return redirect("/login/")
+#
+
+
+#@app.route("/delete/")
+#@app.route("/Delete/")
+#def Delete():
+#	print CURRENT_USER
+#	searched = False
+#	year = request.args.get('name', '')
+#	if CURRENT_USER == '40281026':
+#		SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
+#		json_url = os.path.join(SITE_ROOT, "static", "everything.json")
+#		url = url_for('static',filename='csstest.css')
+#		image = url_for('static',filename='logo1.png')
+#		ro = open(json_url, "r")
+#		data = json.loads(ro.read())
+#		for sighting in data["sightings"]:
+#			if sighting["name"] == name:
+#				print 'found it'
+#		if searched == True:
+#			results.sort()
+#			return redirect('/home/')
+#	else:
+#		return redirect("/login/")
+#
+
+
+#@app.route("/delete/")
+#@app.route("/Delete/")
+#def Delete():
+#	print CURRENT_USER
+#	searched = False
+#	year = request.args.get('name', '')
+#	if CURRENT_USER == '40281026':
+#		SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
+#		json_url = os.path.join(SITE_ROOT, "static", "everything.json")
+#		url = url_for('static',filename='csstest.css')
+#		image = url_for('static',filename='logo1.png')
+#		ro = open(json_url, "r")
+#		data = json.loads(ro.read())
+#		for sighting in data["sightings"]:
+#			if sighting["name"] == name:
+#				print 'found it'
+#		if searched == True:
+#			results.sort()
+#			return redirect('/home/')
+#	else:
+#		return redirect("/login/")
+#
+
 
 
 

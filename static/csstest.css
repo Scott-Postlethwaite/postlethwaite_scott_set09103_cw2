@@ -61,6 +61,26 @@ ul {
 	display:inline-block;
 }
 
+#help{position:relative;
+top: 30px;
+left:900px;
+ background-color: #f44336;
+    color: white;
+    padding: 14px 25px;
+    text-align: center; 
+    text-decoration: none;
+    display: inline-block;
+}
+#hidden{
+        display: none;
+    position: relative;
+}
+
+
+#help:hover #hidden{
+        display:inline-block;
+}
+
 
 a:link{
     color:#0020C2;
