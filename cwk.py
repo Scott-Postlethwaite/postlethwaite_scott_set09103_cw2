@@ -352,6 +352,21 @@ def page_not_found(error):
         return render_template('template2.html', title = title, result = result, csssheet = url, image = image)
 
 
+@app.errorhandler(500)
+def page_not_found(error):
+
+        url = url_for('static',filename='csstest.css')
+        image = url_for('static',filename='logo1.png')
+        SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
+        json_url = os.path.join(SITE_ROOT, "static", "everything.json")
+
+        ro = open(json_url, "r")
+        data = json.loads(ro.read())
+        title = "Something went wrong"
+        result = "I'm sorry, I appear to be experiencing some issues with your request at the moment. Please try again later"
+
+        return render_template('template2.html', title = title, result = result, csssheet = url, image = image)
+
 
 
 
