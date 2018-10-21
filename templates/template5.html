@@ -12,8 +12,8 @@
 		{% if result["img"] != '' %}
 			<div><img src="{{result["img"]}}"style="width:380px;height:240px;"/></div>
 		{% endif %}
-		<div><a href='/year/?year={{result["year"]}}'>{{result["year"]}}</a></div>
-		<div><a href='/country/?country={{result["country"]}}'>{{result["country"]}}</a></div>
+		<div>Year: <a href='/year/?year={{result["year"]}}'>{{result["year"]}}</a></div>
+		<div>Country: <a href='/country/?country={{result["country"]}}'>{{result["country"]}}</a></div>
 		<div>{{result["description"]}}</div>
 		</div>
 		</div>

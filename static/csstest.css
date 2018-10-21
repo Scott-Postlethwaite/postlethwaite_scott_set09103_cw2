@@ -63,7 +63,7 @@ ul {
 
 
 a:link{
-    color:#000000;
+    color:#0020C2;
 	text-decoration: none;
 }
 
@@ -73,6 +73,7 @@ a:visited {
 }
 
 a:hover {
+    color:#0020C2;
 	text-decoration: underline;
 }
 
