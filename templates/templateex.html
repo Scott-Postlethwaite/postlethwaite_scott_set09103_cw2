@@ -26,6 +26,13 @@
 		<li id="edit2"><h3><a href="/country">Countries</a></h3> </li>
 		 <li id="edit2"><h3><a href="/all">All</a></h3> </li>
 		 <li id="edit2"><h3><a href="/upload">Upload</a></h3> </li>
+  {% if not session.logged_in  %}
+                         <li id="edit2"><h3><a href="/login">Login</a></h3> </li>
+                         <li id="edit2"><h3><a href="/register">Register</a></h3> </li>
+                        {% else %}
+                                 <li id="edit2"><h3><a href="/logout">Log Out</a></h3> </li>
+                {% endif %}
+
 </ul>
 	</div>
 	</div>

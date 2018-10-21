@@ -1,18 +1,27 @@
-<!doctype html>
 
 <body>
 <div class="center">
 		<div id="notBody">
+
+
 		<div id="notBody">
 <div class = "posts">
 <p class = "center">
-	 <h1 class = "center">{{title}}</h1>
-	<div class = "center">
-		<div><a href="/year/?year={{year}}">{{year}}</a></div>
-		<div><a href="/country/?country={{counrty}}">{{country}}</a></div>
-		<div>{{description}}</div>
-</div>    
+	 <h1 class = "center">Sign in to your account.</h1>    
  </p>
+
+
+
+
+
+<form action="" name="form"  method="POST" enctype="multipart/form-data">
+<p class="center">Username:</p>
+<textarea type="text" name="username" rows="1" cols = "30" class="center"></textarea><br />
+
+<p class="center">Password:</p>
+<textarea type="text" name="password" rows="1" cols = "30" class="center"></textarea><br />
+ <input type="submit" name="submit" id="submit"  class="center"/>
+</form>
 </div>
 </div>
 	</body>
@@ -32,10 +41,14 @@
                                  <li id="edit2"><h3><a href="/logout">Log Out</a></h3> </li>
                 {% endif %}
 
-	</ul>
+</ul>
 	</div>
 	</div>
 </html> 
 	<link rel = "stylesheet" type="text/css" href="{{csssheet}}" >
 
 </html>
+
+
+
+
