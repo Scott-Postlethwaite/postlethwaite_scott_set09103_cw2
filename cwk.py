@@ -12,6 +12,8 @@ app.config['static'] = static
 loggedIn = False
 app.config['SECRET_KEY'] = os.urandom(24)
 app.config['SESSION_TYPE'] = 'filesystem'
+CURRENT_USER =''
+
 @app.route("/home/", methods=['POST','GET'])
 def home():
 	if request.method == 'POST':
@@ -154,6 +156,7 @@ def login():
 					print "test 3"
 					session['logged_in'] = True
 					loggedIn = True
+					CURRENT_USER = username1
 					return redirect("/home/")
 
 			if  loggedIn == False:
@@ -269,6 +272,7 @@ def logout():
 	return home()
 
 
+
 @app.route("/all/")
 @app.route("/All/")
 def All():
@@ -297,20 +301,41 @@ def register():
 		username = request.form['username']
 		pw = request.form['password']
 #		password = bcrypt.hashpw(pw, bcrypt.gensalt())
-		user = {'username':username,'password':pw}
-		with open(json_url) as f:
-			data = json.load(f)
+		pw2 = request.form['password2']
+		if username != '' and pw != '':
+			if pw == pw2:
+				user = {'username':username,'password':pw}
+				with open(json_url) as f:
+					data = json.load(f)
 
-			for user1 in data["users"]:
-				if user1["username"] == user["username"]:
-					Ysearch = True
-			if Ysearch == False:
-				data["users"].append(user)
-		with open(json_url, 'w') as f:
-			json.dump(data, f)
-			return redirect("/home/")
+					for user1 in data["users"]:
+						if user1["username"] == username:
+							Ysearch = True
+					if Ysearch == False:
+						data["users"].append(user)
+						with open(json_url, 'w') as f:
+							json.dump(data, f)
+						return redirect("/home/")
+
+					if  Ysearch == True:
+						title = "Username already in use"
+						result = "I'm sorry, the username you have requested is unavailable. Please try another."
+
+						return render_template('template2.html', title = title, result = result, csssheet = url, image = image)
+			else:
+				title = "Passwords don't match"
+				result = "I'm sorry, your passwords do not match. Please try again."
+				return render_template('template2.html', title = title, result = result, csssheet = url, image = image)
+
+		else:
+
+                        title = "Missing fields"
+			result = "Either the username or password is blank. Please try again."
+                        return render_template('template2.html', title = title, result = result, csssheet = url, image = image)
+
+
 	else:
-	 	return render_template('register.html', csssheet = url, image = image)
+		return render_template('register.html', csssheet = url, image = image)
 
 
 
