@@ -2,7 +2,7 @@
 #import bcrypt
 import os
 from flask import Flask, Markup, request, render_template, redirect, json, url_for, jsonify, Response, session, abort
-from functools import wraps
+#from functools import wraps
 from sighting import Sighting
 app = Flask(__name__)
 
