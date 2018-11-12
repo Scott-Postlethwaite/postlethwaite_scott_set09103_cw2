@@ -27,18 +27,21 @@ def home():
 			data = json.loads(ro.read())
 			urltype = "year"
 			
-			for subject in data["subjects"]:
-				name1 = subject["name"]
+			for post in data["posts"]:
+				subject1 = post["subject"]
+				title1 = post["title"]
+				author1 = post["author"]
 
-				if name.upper() == name1.upper():
+				if name.upper() == subject1.upper():
 					searched = True
-					results.append(sighting)
+					results.append(post)
 
-			for user in data["users"]:
-				name1 = user["username"]
-				if name1.upper() ==name.upper():
+				if name.upper() == title1.upper():
 					searched = True
-					results.append(user)
+					results.append(post)
+				if name.upper() == author1.upper():
+					searched = True
+					results.append(post)					
 
 			if searched == True:
 				results.sort()
@@ -141,7 +144,7 @@ def login():
 			for user in data["users"]:
 				username1 = user["username"]
 				password1 = user["password"]
-					if( bcrypt.hashpw(password.encode('utf-8'),password1) == password  and username1 == username):
+				if( bcrypt.hashpw(password.encode('utf-8'),password1) == password  and username1 == username):
 	#			if( password1 == pw and username1 == username):
 					session['logged_in'] = True
 					session['CURRENT_USER'] = user
@@ -212,7 +215,7 @@ def Subject():
 @app.route("/following/")
 @app.route("/Following/")
 def Following():
-if not session.get('logged_in'):
+	if not session.get('logged_in'):
         	return login()
 	else:
 		SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
@@ -223,8 +226,8 @@ if not session.get('logged_in'):
 		data = json.loads(ro.read())
 		for user in data["users"]:
 			if user["username"] == session.get('CURRENT_USER')['username']:
-				for follows in user["following"]
-					for post in data["posts"]
+				for follows in user["following"]:
+					for post in data["posts"]:
 						if post["subject"] == follows:
 							results.append(post)
 							searched = True
