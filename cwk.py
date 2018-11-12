@@ -135,7 +135,8 @@ def login():
 			SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
 			username = request.form['username']
 			pw = request.form['password']
-			password = bcrypt.hashpw(pw, bcrypt.gensalt())
+			pwd = pw.encode('utf-8')
+			password = bcrypt.hashpw(pwd, bcrypt.gensalt())
 			json_url = os.path.join(SITE_ROOT, "static", "everything.json")
 			url = url_for('static',filename='csstest.css')
 			image = url_for('static',filename='logo1.png')
@@ -282,7 +283,8 @@ def register():
 		json_url = os.path.join(SITE_ROOT, "static", "everything.json")
 		username = request.form['username']
 		pw = request.form['password']
-		password = bcrypt.hashpw(pw.encode('utf-8'))
+		pwd = pw.encode('utf-8')
+		password = bcrypt.hashpw(pwd, bcrypt.gensalt())
 		pw2 = request.form['password2']
 		if 'datafile' not in request.files:
 			ppic = ''
