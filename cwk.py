@@ -144,7 +144,7 @@ def login():
 			for user in data["users"]:
 				username1 = user["username"]
 				password1 = user["password"]
-				if( bcrypt.hashpw(password.encode('utf-8'),password1) == password  and username1 == username):
+				if( bcrypt.hashpw(password1 == password  and username1 == username):
 	#			if( password1 == pw and username1 == username):
 					session['logged_in'] = True
 					session['CURRENT_USER'] = user
@@ -282,7 +282,7 @@ def register():
 		json_url = os.path.join(SITE_ROOT, "static", "everything.json")
 		username = request.form['username']
 		pw = request.form['password']
-		password = bcrypt.hashpw(pw, bcrypt.gensalt())
+		password = bcrypt.hashpw(password.encode('utf-8'),pw)
 		pw2 = request.form['password2']
 		if 'datafile' not in request.files:
 			ppic = ''
