@@ -282,7 +282,7 @@ def register():
 		json_url = os.path.join(SITE_ROOT, "static", "everything.json")
 		username = request.form['username']
 		pw = request.form['password']
-		password = bcrypt.hashpw(password.encode('utf-8'),pw)
+		passwd = bcrypt.hashpw(password.encode('utf-8'),pw)
 		pw2 = request.form['password2']
 		if 'datafile' not in request.files:
 			ppic = ''
@@ -293,7 +293,7 @@ def register():
 			ppic = url_for('static',filename = fname)
 		if username != '' and pw != '':
 			if pw == pw2:
-				user = {'username':username,'password':password,'following':[],'posts':[],'Ppic':ppic}
+				user = {'username':username,'password':passwd,'following':[],'posts':[],'Ppic':ppic}
 				with open(json_url) as f:
 					data = json.load(f)
 
