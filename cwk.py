@@ -282,7 +282,7 @@ def register():
 		json_url = os.path.join(SITE_ROOT, "static", "everything.json")
 		username = request.form['username']
 		pw = request.form['password']
-		password = bcrypt.hashpw(pw.encode('utf-8'),password)
+		password = bcrypt.hashpw(pw.encode('utf-8'))
 		pw2 = request.form['password2']
 		if 'datafile' not in request.files:
 			ppic = ''
