@@ -11,8 +11,7 @@
 		 <h1 class = "center">The {{result["name"]}} Incident</h1>
 		{% if result["img"] != '' %}
 			<div><img src="{{result["img"]}}"style="width:380px;height:240px;"/></div>
-		{% endif %}
-		<div>Year: <a href='/year/?year={{result["year"]}}'>{{result["year"]}}</a></div>
+		{% endif %}sesar/?year={{result["year"]}}'>{{result["year"]}}</a></div>
 		<div>Country: <a href='/country/?country={{result["country"]}}'>{{result["country"]}}</a></div>
 		<div>{{result["description"]}}</div>
 		</div>
@@ -24,7 +23,12 @@
 </div>
 	</body>
 	<div id="dropdown">
-	<div id="logo"><img src="{{image}}"style="width:120px;height:120px;"/></div>
+	{% if session.CURRENT_USER["Ppic"] != '' %}
+			<div><img src="{{CURRENT_USER["Ppic"]}}"style="width:380px;height:240px;"/></div>
+		{% else %}
+			<div id="logo"><img src="{{image}}"style="width:120px;height:120px;"/></div>
+		{% endif %}
+
 	<div id="hiddenMenu">
 	<ul>
 		<li id="write"><h3><a href="/home">Home</a></h3> </li>

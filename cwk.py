@@ -1,18 +1,15 @@
-# coding: utf-8
-#import bcrypt
+#coding: utf-8
+import bcrypt
 import os
 from flask import Flask, Markup, request, render_template, redirect, json, url_for, jsonify, Response, session, abort
-#from functools import wraps
-from sighting import Sighting
+from functools import wraps
 app = Flask(__name__)
 
 SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
 static = os.path.join(SITE_ROOT, 'static')
 app.config['static'] = static
-loggedIn = False
 app.config['SECRET_KEY'] = os.urandom(24)
 app.config['SESSION_TYPE'] = 'filesystem'
-CURRENT_USER =''
 
 @app.route("/home/", methods=['POST','GET'])
 def home():
@@ -30,27 +27,22 @@ def home():
 			data = json.loads(ro.read())
 			urltype = "year"
 			
-			for sighting in data["sightings"]:
-				name1 = sighting["name"]
-				country = sighting["country"]
+			for subject in data["subjects"]:
+				name1 = subject["name"]
 
 				if name.upper() == name1.upper():
 					searched = True
 					results.append(sighting)
 
-				if sighting["year"] ==name:
+			for user in data["users"]:
+				name1 = user["username"]
+				if name1.upper() ==name.upper():
 					searched = True
-					results.append(sighting)
-
-				if country.upper() == name.upper():
-					searched = True
-					results.append(sighting)
-	
-
+					results.append(user)
 
 			if searched == True:
 				results.sort()
-				return  render_template('template5.html', results = results, csssheet = url, image = image, logged = loggedIn)
+				return  render_template('template5.html', results = results, csssheet = url, image = image,user = session.get('CURRENT_USER'))
 
 
 
@@ -58,7 +50,7 @@ def home():
 				title = "I'm sorry we couldn't find that"
 				result = 'The page you requested does not exist. If you are having trouble finding things, try navigating using the alien head. If you think it should exist then add it using our new upload feature!'
 
-			return render_template('template2.html', title = title, result = result, csssheet = url, image = image)
+			return render_template('template2.html', title = title, result = result, csssheet = url, image = image,user = session.get('CURRENT_USER'))
 
 
 				
@@ -71,7 +63,7 @@ def home():
 		image = url_for('static',filename='logo1.png')
 	
 
-		return render_template('templateex.html', csssheet = url, image = image)
+		return render_template('templateex.html', csssheet = url, image = image,user = session.get('CURRENT_USER'))
 
 #this allows the user to report their own sighting. They also have the option of adding an image.
 @app.route("/upload/",methods=['POST','GET'])
@@ -95,7 +87,8 @@ def upload():
 				year = request.form['uplYear']
 				country = request.form['uplCountry']
 				description = request.form['uplDescription']
-				sighting = {'name':name, 'year':year, 'country':country, 'description':description, 'img':img}
+				user = session.get('CURRENT_USER')
+				sighting = {'name':name, 'year':year, 'country':country, 'description':description, 'img':img, 'user':user}
 				with open(json_url) as f:
 					data = json.load(f)
 					data["sightings"].append(sighting)
@@ -123,7 +116,7 @@ def upload():
 				image = url_for('static',filename='logo1.png')
 
 
-				return render_template('uplTemplate.html', csssheet = url, image = image)
+				return render_template('uplTemplate.html', csssheet = url, image = image,user = session.get('CURRENT_USER'))
 
 
 @app.route('/login',methods=['POST','GET'])
@@ -139,53 +132,48 @@ def login():
 			SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
 			username = request.form['username']
 			pw = request.form['password']
-	#		password = bcrypt.hashpw(pw, bcrypt.gensalt())
+			password = bcrypt.hashpw(pw, bcrypt.gensalt())
 			json_url = os.path.join(SITE_ROOT, "static", "everything.json")
 			url = url_for('static',filename='csstest.css')
 			image = url_for('static',filename='logo1.png')
 			ro = open(json_url, "r")
 			data = json.loads(ro.read())
-			print "test 1"
-
 			for user in data["users"]:
 				username1 = user["username"]
 				password1 = user["password"]
-				print "test2"
-	#				if( bcrypt.hashpw(password.encode('utf-8'),password1) == password  and username1 == username):
-				if( password1 == pw and username1 == username):
-					print "test 3"
+					if( bcrypt.hashpw(password.encode('utf-8'),password1) == password  and username1 == username):
+	#			if( password1 == pw and username1 == username):
 					session['logged_in'] = True
-					loggedIn = True
-					CURRENT_USER = username1
+					session['CURRENT_USER'] = user
 					return redirect("/home/")
 
 			if  loggedIn == False:
 				title = "Incorrect details"
 	        	        result = "I'm sorry, your details appear to be incorrect. If do not already have an account with us follow the register link."
 	
-        	   		return render_template('template2.html', title = title, result = result, csssheet = url, image = image)
+        	   		return render_template('template2.html', title = title, result = result, csssheet = url, image = image,user = session.get('CURRENT_USER'))
 			
 		else:
 			title = "Incorrect details"
 			result = "I'm sorry, your details appear to be incorrect. If do not already have an account with us follow the register link."
 
-			return render_template('template2.html', title = title, result = result, csssheet = url, image = image)
+			return render_template('template2.html', title = title, result = result, csssheet = url, image = image,user = session.get('CURRENT_USER'))
 
 
 	else: 
-		 return render_template('login.html', csssheet = url, image = image)
+		 return render_template('login.html', csssheet = url, image = image,user = session.get('CURRENT_USER'))
 
 
 
 #stacking the routes makes them the same
 #this shows all years in which there are reported ufo sightings
-@app.route("/year/")
-@app.route("/Year/")
-def Year():
+@app.route("/subject/")
+@app.route("/Subject/")
+def Subject():
 	searched = False
 	results = []
-	year = request.args.get('year', '')
-	if year == '':
+	subject = request.args.get('subject', '')
+	if subject == '':
 		SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
 		json_url = os.path.join(SITE_ROOT, "static", "everything.json")
 		url = url_for('static',filename='csstest.css')
@@ -193,11 +181,11 @@ def Year():
 	
 		ro = open(json_url, "r")
 		data = json.loads(ro.read())
-		entries = data["years"]
+		entries = data["subjects"]
 		entries = [int(x) for x in entries]
 		entries.sort()
-		title = "All years with reported ufo sightings"
-		return render_template('template3.html', results = entries, title = title, csssheet = url, image = image)
+		title = "Search by subject"
+		return render_template('template3.html', results = entries, title = title, csssheet = url, image = image,user = session.get('CURRENT_USER'))
 	else:
 			SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
 			json_url = os.path.join(SITE_ROOT, "static", "everything.json")
@@ -206,61 +194,52 @@ def Year():
 			ro = open(json_url, "r")
 			data = json.loads(ro.read())
 			for sighting in data["sightings"]:
-				if sighting["year"] == year:
+				if sighting["subject"] == subject:
 					searched = True
 					results.append(sighting)
 			if searched == True:
 				results.sort()
-				return  render_template('template5.html', results = results, csssheet = url, image = image)
+				return  render_template('template5.html', results = results, csssheet = url, image = image,user = session.get('CURRENT_USER'))
 
 
 			if searched == False:
 				result = 'The page you requested does not exist. If you are having trouble finding things, try navigating using the alien head. If you think it should exist, try adding it to our database using our new upload feature!'
 
-			return render_template('template2.html', title = result, csssheet = url, image = image)
+			return render_template('template2.html', title = result, csssheet = url, image = image,user = session.get('CURRENT_USER'))
 
 
 #this shows all countries in which ufo sightings have happened
-@app.route("/country/")
-@app.route("/Country/")
-def Country():
-	searched = False
-	results = []
-	country = request.args.get('country', '')
-	if country == '':
-	
+@app.route("/following/")
+@app.route("/Following/")
+def Following():
+if not session.get('logged_in'):
+        	return login()
+	else:
 		SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
 		json_url = os.path.join(SITE_ROOT, "static", "everything.json")
 		url = url_for('static',filename='csstest.css')
 		image = url_for('static',filename='logo1.png')
-	
 		ro = open(json_url, "r")
 		data = json.loads(ro.read())
-		entries = data["countries"]
-		entries.sort()
-		title = "All Countries with reported ufo sightings"
-
-		return render_template('template6.html', results = entries,title = title, csssheet = url, image = image)
-	else:
-			SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
-			json_url = os.path.join(SITE_ROOT, "static", "everything.json")
-			url = url_for('static',filename='csstest.css')
-			image = url_for('static',filename='logo1.png')
-			ro = open(json_url, "r")
-			data = json.loads(ro.read())
-			for sighting in data["sightings"]:
-				if sighting["country"] == country:
-					searched = True
-					results.append(sighting)
-			if searched == True:
-				results.sort()
-				return  render_template('template5.html', results = results, csssheet = url, image = image)
+		for user in data["users"]:
+			if user["username"] == session.get('CURRENT_USER')['username']:
+				for follows in user["following"]
+					for post in data["posts"]
+						if post["subject"] == follows:
+							results.append(post)
+							searched = True
+						if post["user"] == follows:
+							results.append(post)
+							searched = True
+		if searched == True:
+			results.sort()
+			return  render_template('template5.html', results = results, csssheet = url, image = image, user = session.get('CURRENT_USER'))
 
 
-			if searched == False:
-				result = 'The page you requested does not exist. If you are having trouble finding things, try navigating using the alien head. If you think it should exist then add it using our new upload feature!'
+		if searched == False:
+			result = 'The page you requested does not exist. If you are having trouble finding things, try navigating using the alien head. If you think it should exist then add it using our new upload feature!'
 
-			return render_template('template2.html', title = result, csssheet = url, image = image)
+		return render_template('template2.html', title = result, csssheet = url, image = image,user = session.get('CURRENT_USER'))
 
 
 
@@ -268,7 +247,7 @@ def Country():
 @app.route("/logout")
 def logout():
 	session['logged_in'] = False
-	loggedIn = False
+	session['CURRENT_USER']=''
 	return home()
 
 
@@ -276,14 +255,14 @@ def logout():
 @app.route("/all/")
 @app.route("/All/")
 def All():
-#This lists all sightings saved in the directory
+#This lists all posts saved in the directory
 	SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
 	json_url = os.path.join(SITE_ROOT, "static", "everything.json")
 	url = url_for('static',filename='csstest.css')
 	image = url_for('static',filename='logo1.png')
 	ro = open(json_url, "r")
 	data = json.loads(ro.read())
-	results = data["sightings"]
+	results = data["posts"]
 	results.sort()
 	return  render_template('template5.html', results = results, csssheet = url, image = image)
 
@@ -300,11 +279,18 @@ def register():
 		json_url = os.path.join(SITE_ROOT, "static", "everything.json")
 		username = request.form['username']
 		pw = request.form['password']
-#		password = bcrypt.hashpw(pw, bcrypt.gensalt())
+		password = bcrypt.hashpw(pw, bcrypt.gensalt())
 		pw2 = request.form['password2']
+		if 'datafile' not in request.files:
+			ppic = ''
+		else:
+			f = request.files['datafile']
+			fname = f.filename
+			f.save(os.path.join(app.config['static'], fname))	
+			ppic = url_for('static',filename = fname)
 		if username != '' and pw != '':
 			if pw == pw2:
-				user = {'username':username,'password':pw}
+				user = {'username':username,'password':password,'following':[],'posts':[],'Ppic':ppic}
 				with open(json_url) as f:
 					data = json.load(f)
 
