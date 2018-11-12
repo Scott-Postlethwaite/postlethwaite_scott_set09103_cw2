@@ -144,7 +144,7 @@ def login():
 			for user in data["users"]:
 				username1 = user["username"]
 				password1 = user["password"]
-				if( bcrypt.hashpw(password1 == password  and username1 == username):
+				if(password1 == password and username1 == username):
 	#			if( password1 == pw and username1 == username):
 					session['logged_in'] = True
 					session['CURRENT_USER'] = user
