@@ -443,8 +443,9 @@ def User():
 
 			with open(json_url, 'w') as f:
 				json.dump(data, f)		
+		return redirect('/user/?user='user)
 	
-	else
+	else:
 		if user == '':
 			SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
 			json_url = os.path.join(SITE_ROOT, "static", "everything.json")

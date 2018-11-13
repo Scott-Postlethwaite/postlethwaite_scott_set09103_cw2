@@ -13,11 +13,13 @@
 	<div class = "center">
 		<div>{{bio}}</div>
 </div>    
+<form action="" name="form"  method="POST" enctype="multipart/form-data">
 {% if Uname in user['following'] %}
 	<input type="submit" name="submit_button" value="Unfollow">
 {% else %}
 	<input type="submit" name="submit_button" value="Follow">
 {% endif %}
+</form>
 	</div>
  </p>
 </div>
