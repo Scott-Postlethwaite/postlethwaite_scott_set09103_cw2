@@ -25,7 +25,6 @@ def home():
 			print image
 			ro = open(json_url, "r")
 			data = json.loads(ro.read())
-			urltype = "year"
 			
 			for post in data["posts"]:
 				subject1 = post["subject"]
@@ -95,7 +94,7 @@ def upload():
 				subject = request.form['uplSubject']
 				description = request.form['uplDescription']
 				user = session.get('CURRENT_USER')
-				post = {'name':name, 'subject':subject, 'user':user['username'], 'description':description, 'img':img}
+				post = {'name':name, 'subject':subject, 'author':user['username'], 'description':description, 'img':img}
 				with open(json_url) as f:
 					data = json.load(f)
 					data["posts"].append(post)
@@ -183,7 +182,6 @@ def Subject():
 		ro = open(json_url, "r")
 		data = json.loads(ro.read())
 		entries = data["subjects"]
-		entries = [int(x) for x in entries]
 		entries.sort()
 		title = "Search by subject"
 		return render_template('template3.html', results = entries, title = title, csssheet = url, image = image,user = session.get('CURRENT_USER'))
@@ -213,6 +211,8 @@ def Subject():
 @app.route("/following/")
 @app.route("/Following/")
 def Following():
+	searched = False
+	results = []
 	if not session.get('logged_in'):
         	return login()
 	else:
