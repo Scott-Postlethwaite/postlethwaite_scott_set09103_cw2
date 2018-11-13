@@ -13,7 +13,12 @@
 	<div class = "center">
 		<div>{{bio}}</div>
 </div>    
-</div>
+{% if Uname in user['following'] %}
+	<input type="submit" name="submit_button" value="Unfollow">
+{% else %}
+	<input type="submit" name="submit_button" value="Follow">
+{% endif %}
+	</div>
  </p>
 </div>
 </div>

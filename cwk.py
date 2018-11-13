@@ -403,50 +403,87 @@ def Help():
 		
 		
 		
-@app.route("/user/")
-@app.route("/User/")
+@app.route("/user/",methods=['POST','GET'])
+@app.route("/User/",methods=['POST','GET'])
 def User():
 	searched = False
 	results = []
 	user = request.args.get('user', '')
-	if user == '':
-		SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
-		json_url = os.path.join(SITE_ROOT, "static", "everything.json")
-		url = url_for('static',filename='csstest.css')
-		image = url_for('static',filename='logo1.png')
-	
-		ro = open(json_url, "r")
-		data = json.loads(ro.read())
-		entries = data["users"]
-		entries.sort()
-		title = "Search by user"
-		return render_template('template3.html', results = entries, title = title, csssheet = url, image = image,user = session.get('CURRENT_USER'))
-	else:
+	if request.method == 'POST':
+		if request.form['submit_button'] == 'Follow':
 			SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
 			json_url = os.path.join(SITE_ROOT, "static", "everything.json")
 			url = url_for('static',filename='csstest.css')
 			image = url_for('static',filename='logo1.png')
 			ro = open(json_url, "r")
 			data = json.loads(ro.read())
-			for Ruser in data["users"]:
-				if Ruser["username"] == user:
-					searched = True
-					profilePic = Ruser['Ppic']
-					name = Ruser['username']
-					bio = Ruser['bio']
-			for post in data["posts"]:
-				if post["author"] == user:
-					searched = True
-					results.append(post)
-			if searched == True:
-				results.sort()
-				return  render_template('profile.html', results = results, csssheet = url, image = image,user = session.get('CURRENT_USER'),Uname=name,bio=bio,profilePic=profilePic)
+			for dUser in data["users"]:
+				if dUser["username"] == session.get('CURRENT_USER')['username']:
+					for follows in dUser["following"]:
+						if follows == user:
+							Ysearch = True
+				if Ysearch == False:
+					user["following"].append(user)
+
+			with open(json_url, 'w') as f:
+				json.dump(data, f)
+			
+		if request.form['submit_button'] == 'Unfollow':
+			SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
+			json_url = os.path.join(SITE_ROOT, "static", "everything.json")
+			url = url_for('static',filename='csstest.css')
+			image = url_for('static',filename='logo1.png')
+			ro = open(json_url, "r")
+			data = json.loads(ro.read())
+			for dUser in data["users"]:
+				if dUser["username"] == session.get('CURRENT_USER')['username']:
+					for follows in dUser["following"]:
+						if follows == user:
+							user["following"].remove(user)
+
+			with open(json_url, 'w') as f:
+				json.dump(data, f)		
+	
+	else
+		if user == '':
+			SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
+			json_url = os.path.join(SITE_ROOT, "static", "everything.json")
+			url = url_for('static',filename='csstest.css')
+			image = url_for('static',filename='logo1.png')
+		
+			ro = open(json_url, "r")
+			data = json.loads(ro.read())
+			entries = data["users"]
+			entries.sort()
+			title = "Search by user"
+			return render_template('template3.html', results = entries, title = title, csssheet = url, image = image,user = session.get('CURRENT_USER'))
+		else:
+		
+				SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
+				json_url = os.path.join(SITE_ROOT, "static", "everything.json")
+				url = url_for('static',filename='csstest.css')
+				image = url_for('static',filename='logo1.png')
+				ro = open(json_url, "r")
+				data = json.loads(ro.read())
+				for Ruser in data["users"]:
+					if Ruser["username"] == user:
+						searched = True
+						profilePic = Ruser['Ppic']
+						name = Ruser['username']
+						bio = Ruser['bio']
+				for post in data["posts"]:
+					if post["author"] == user:
+						searched = True
+						results.append(post)
+				if searched == True:
+					results.sort()
+					return  render_template('profile.html', results = results, csssheet = url, image = image,user = session.get('CURRENT_USER'),Uname=name,bio=bio,profilePic=profilePic)
 
 
-			if searched == False:
-				result = 'The page you requested does not exist. If you are having trouble finding things, try navigating using the alien head. If you think it should exist, try adding it to our database using our new upload feature!'
+				if searched == False:
+					result = 'The page you requested does not exist. If you are having trouble finding things, try navigating using the alien head. If you think it should exist, try adding it to our database using our new upload feature!'
 
-			return render_template('template2.html', title = result, csssheet = url, image = image,user = session.get('CURRENT_USER'))
+				return render_template('template2.html', title = result, csssheet = url, image = image,user = session.get('CURRENT_USER'))
 
 
 
