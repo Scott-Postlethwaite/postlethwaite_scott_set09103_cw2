@@ -29,7 +29,7 @@ def home():
 			
 			for post in data["posts"]:
 				subject1 = post["subject"]
-				title1 = post["title"]
+				title1 = post["name"]
 				author1 = post["author"]
 
 				if name.upper() == subject1.upper():
@@ -194,10 +194,10 @@ def Subject():
 			image = url_for('static',filename='logo1.png')
 			ro = open(json_url, "r")
 			data = json.loads(ro.read())
-			for sighting in data["sightings"]:
-				if sighting["subject"] == subject:
+			for post in data["posts"]:
+				if post["subject"] == subject:
 					searched = True
-					results.append(sighting)
+					results.append(post)
 			if searched == True:
 				results.sort()
 				return  render_template('template5.html', results = results, csssheet = url, image = image,user = session.get('CURRENT_USER'))
@@ -283,6 +283,7 @@ def register():
 		pwd = pw.encode('utf-8')
 		password = bcrypt.hashpw(pwd, bcrypt.gensalt())
 		pw2 = request.form['password2']
+		bio = request.form['uplBio']
 		if 'datafile' not in request.files:
 			ppic = ''
 		else:
@@ -292,7 +293,7 @@ def register():
 			ppic = url_for('static',filename = fname)
 		if username != '' and pw != '':
 			if pw == pw2:
-				user = {'username':username,'password':password,'following':[],'Ppic':ppic}
+				user = {'username':username,'password':password,'following':[],'Ppic':ppic, 'bio':bio}
 				with open(json_url) as f:
 					data = json.load(f)
 
@@ -396,6 +397,57 @@ def Help():
         result = "The menu is hidden under the alien head. Just hover your mouse over it and the menu will appear. You can search for sightings by name, year or country of origin using our search feature or you can display all. If you would like to report a sighting you can by registering an account with us and using our upload feature!"
 
         return render_template('template2.html', title = title, result = result, csssheet = url, image = image,user=session.get('CURRENT_USER'))
+
+		
+		
+		
+		
+@app.route("/user/")
+@app.route("/User/")
+def User():
+	searched = False
+	results = []
+	user = request.args.get('user', '')
+	if user == '':
+		SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
+		json_url = os.path.join(SITE_ROOT, "static", "everything.json")
+		url = url_for('static',filename='csstest.css')
+		image = url_for('static',filename='logo1.png')
+	
+		ro = open(json_url, "r")
+		data = json.loads(ro.read())
+		entries = data["users"]
+		entries = [int(x) for x in entries]
+		entries.sort()
+		title = "Search by user"
+		return render_template('template3.html', results = entries, title = title, csssheet = url, image = image,user = session.get('CURRENT_USER'))
+	else:
+			SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
+			json_url = os.path.join(SITE_ROOT, "static", "everything.json")
+			url = url_for('static',filename='csstest.css')
+			image = url_for('static',filename='logo1.png')
+			ro = open(json_url, "r")
+			data = json.loads(ro.read())
+			for Ruser in data["users"]:
+				if Ruser["username"] == user:
+					searched = True
+					profilePic = Ruser['Ppic']
+					name = Ruser['username']
+					bio = Ruser['bio']
+			for post in data["posts"]:
+				if post["author"] == user:
+					searched = True
+					results.append(post)
+			if searched == True:
+				results.sort()
+				return  render_template('profile.html', results = results, csssheet = url, image = image,user = session.get('CURRENT_USER'),Uname=name,bio=bio,profilePic=profilePic)
+
+
+			if searched == False:
+				result = 'The page you requested does not exist. If you are having trouble finding things, try navigating using the alien head. If you think it should exist, try adding it to our database using our new upload feature!'
+
+			return render_template('template2.html', title = result, csssheet = url, image = image,user = session.get('CURRENT_USER'))
+
 
 
 

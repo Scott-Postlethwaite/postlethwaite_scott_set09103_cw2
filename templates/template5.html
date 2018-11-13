@@ -8,11 +8,12 @@
 	{% for result in results %}		
 		<div id="notBody">
 		<div class = "posts">
-		 <h1 class = "center">The {{result["name"]}} Incident</h1>
+		 <h1 class = "center">{{result["name"]}}</h1>
 		{% if result["img"] != '' %}
 			<div><img src="{{result["img"]}}"style="width:380px;height:240px;"/></div>
-		{% endif %}sesar/?year={{result["year"]}}'>{{result["year"]}}</a></div>
-		<div>Country: <a href='/country/?country={{result["country"]}}'>{{result["country"]}}</a></div>
+		{% endif %}
+		<div>Subject: <a href='/subject/?subject={{result["subject"]}}'>{{result["subject"]}}</a></div>
+		<div><a href='/user/?={{result["author"]}}'>{{result["author"]}}</a></div>
 		<div>{{result["description"]}}</div>
 		</div>
 		</div>

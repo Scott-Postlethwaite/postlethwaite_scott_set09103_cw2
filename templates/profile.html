@@ -6,15 +6,31 @@
 		<div id="notBody">
 <div class = "posts">
 <p class = "center">
-	 <h1 class = "center">{{title}}</h1>
+{% if profilePic != '' %}
+	<img src="{{profilePic}}"style="width:360px;height:360px;"/></div>
+{% endif %}
+	 <h1 class = "center">{{Uname}}</h1>
 	<div class = "center">
-	{% for result in results %}
-		<h3><a href="/subject/?subject={{result}}">{{result}}</a></h3>
-	{% endfor %}
+		<div>{{bio}}</div>
 </div>    
  </p>
 </div>
 </div>
+	<div id ="notBody">
+	{% for result in results %}		
+		<div id="notBody">
+		<div class = "posts">
+		 <h1 class = "center">{{result["name"]}}</h1>
+		{% if result["img"] != '' %}
+			<div><img src="{{result["img"]}}"style="width:380px;height:240px;"/></div>
+		{% endif %}
+		<div>Subject: <a href='/subject/?subject={{result["subject"]}}'>{{result["subject"]}}</a></div>
+		<div><a href='/user/?={{result["author"]}}'>{{result["author"]}}</a></div>
+		<div>{{result["description"]}}</div>
+		</div>
+		</div>
+	{% endfor %}
+</div>    
 	</body>
 	<div id="dropdown">
 	{% if not session.logged_in  %}
@@ -26,7 +42,6 @@
 			<div id="logo"><img src="{{image}}"style="width:120px;height:120px;"/></div>
 		{% endif %}
                 {% endif %}
-
 
 	<div id="hiddenMenu">
 	<ul>
