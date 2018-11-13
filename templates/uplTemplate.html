@@ -15,15 +15,11 @@
 
 
 <form action="" name="form"  method="POST" enctype="multipart/form-data">
-<p class="center">Name:</p>
+<p class="center">Title:</p>
 <textarea type="text" name="uplName" rows="1" cols = "30" class="center"></textarea><br />
 
-<p class="center">Year:</p>
-<textarea type="text" name="uplYear" rows="1" cols = "30" class="center"></textarea><br />
-
-<p class="center">Country:</p>
-<textarea type="text" name="uplCountry" rows="1" cols = "30" class="center"></textarea><br />
-
+<p class="center">Subject:</p>
+<textarea type="text" name="uplSubject" rows="1" cols = "30" class="center"></textarea><br />
 
 <p class="center">Description:</p>
   <textarea name="uplDescription" rows="15" cols="100" class="center"></textarea><br />
@@ -38,14 +34,19 @@
 </div>
 	</body>
 	<div id="dropdown">
-	<div id="logo"><img src="{{image}}"style="width:120px;height:120px;"/></div>
+	{% if session.user["Ppic"] != '' %}
+			<div><img src="{{user["Ppic"]}}"style="width:150px;height:150px; border-radius:50%;"/></div>
+		{% else %}
+			<div id="logo"><img src="{{image}}"style="width:120px;height:120px;"/></div>
+		{% endif %}
+
 	<div id="hiddenMenu">
 	<ul>
 		<li id="write"><h3><a href="/home">Home</a></h3> </li>
-		<li id="delete"><h3><a href="/year">Years</a></h3> </li>
-		<li id="edit2"><h3><a href="/country">Countries</a></h3> </li>
+		<li id="delete"><h3><a href="/subject">Subjects</a></h3> </li>
+		<li id="edit2"><h3><a href="/following">Following</a></h3> </li>
 		 <li id="edit2"><h3><a href="/all">All</a></h3> </li>
-		 <li id="edit2"><h3><a href="/upload">Upload</a></h3> </li>
+		 <li id="edit2"><h3><a href="/upload">Post</a></h3> </li>
   {% if not session.logged_in  %}
                          <li id="edit2"><h3><a href="/login">Login</a></h3> </li>
                          <li id="edit2"><h3><a href="/register">Register</a></h3> </li>

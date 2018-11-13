@@ -7,8 +7,8 @@
 <div id="notBody">
 <div class = "posts">
 <p class = "center">
-	 <h1 class = "center">UFO SIGHTINGS</h1>
-	<div class = "center"> All major sightings of ufos are recorded on this site</div>    
+	 <h1 class = "center">Conspiracy Nuts</h1>
+	<div class = "center">Voice your conspiracies and debunk others</div>    
  </p>
 		<form action="" method="POST" name="form" class = "center">
 			<label for="name">Search:</label>
@@ -19,16 +19,39 @@
 	
 </div>
 </div></div>
+
+	<div class = "center">
+	<div id ="notBody">
+	{% for result in results %}		
+		<div id="notBody">
+		<div class = "posts">
+		 <h1 class = "center">The {{result["name"]}} Incident</h1>
+		{% if result["img"] != '' %}
+			<div><img src="{{result["img"]}}"style="width:380px;height:240px;"/></div>
+		{% endif %}sesar/?year={{result["year"]}}'>{{result["year"]}}</a></div>
+		<div>Country: <a href='/country/?country={{result["country"]}}'>{{result["country"]}}</a></div>
+		<div>{{result["description"]}}</div>
+		</div>
+		</div>
+	{% endfor %}
+</div>    
+</div>
+
 	</body>
 	<div id="dropdown">
-	<div id="logo"><img src="{{image}}"style="width:120px;height:120px;"/></div>
+	{% if session.user["Ppic"] != '' %}
+			<div><img src="{{user["Ppic"]}}"style="width:150px;height:150px; border-radius:50%;"/></div>
+		{% else %}
+			<div id="logo"><img src="{{image}}"style="width:120px;height:120px;"/></div>
+		{% endif %}
+
 	<div id="hiddenMenu">
 	<ul>
-		<li id="write"><h3><a href="/home">Home</a></h3> </li>
-		<li id="delete"><h3><a href="/year">Years</a></h3> </li>
-		<li id="edit2"><h3><a href="/country">Countries</a></h3> </li>
+<li id="write"><h3><a href="/home">Home</a></h3> </li>
+		<li id="delete"><h3><a href="/subject">Subjects</a></h3> </li>
+		<li id="edit2"><h3><a href="/following">Following</a></h3> </li>
 		 <li id="edit2"><h3><a href="/all">All</a></h3> </li>
-		 <li id="edit2"><h3><a href="/upload">Upload</a></h3> </li>
+		 <li id="edit2"><h3><a href="/upload">Post</a></h3> </li>
   {% if not session.logged_in  %}
                          <li id="edit2"><h3><a href="/login">Login</a></h3> </li>
                          <li id="edit2"><h3><a href="/register">Register</a></h3> </li>

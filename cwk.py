@@ -56,7 +56,6 @@ def home():
 			return render_template('template2.html', title = title, result = result, csssheet = url, image = image,user = session.get('CURRENT_USER'))
 
 
-				
 
 	#This will redirect the user to the page that matches their search. This redirects to their input	
 
@@ -64,9 +63,15 @@ def home():
 
 		url = url_for('static',filename='csstest.css')
 		image = url_for('static',filename='logo1.png')
-	
-
-		return render_template('templateex.html', csssheet = url, image = image,user = session.get('CURRENT_USER'))
+		SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
+		json_url = os.path.join(SITE_ROOT, "static", "everything.json")
+		url = url_for('static',filename='csstest.css')
+		image = url_for('static',filename='logo1.png')
+		ro = open(json_url, "r")
+		data = json.loads(ro.read())
+		results = data["posts"]
+		results.sort()
+		return render_template('templateex.html', csssheet = url, image = image,user = session.get('CURRENT_USER'),results=results)
 
 #this allows the user to report their own sighting. They also have the option of adding an image.
 @app.route("/upload/",methods=['POST','GET'])
@@ -87,25 +92,18 @@ def upload():
 				f.save(os.path.join(app.config['static'], fname))	
 				img = url_for('static',filename = fname)	
 				name = request.form['uplName']
-				year = request.form['uplYear']
-				country = request.form['uplCountry']
+				subject = request.form['uplSubject']
 				description = request.form['uplDescription']
 				user = session.get('CURRENT_USER')
-				sighting = {'name':name, 'year':year, 'country':country, 'description':description, 'img':img, 'user':user}
+				post = {'name':name, 'subject':subject, 'user':user['username'], 'description':description, 'img':img}
 				with open(json_url) as f:
 					data = json.load(f)
-					data["sightings"].append(sighting)
-					for dYear in data["years"]:
-						if dYear == year:
+					data["posts"].append(post)
+					for dSubject in data["subjects"]:
+						if dSubject == subject:
 							Ysearch = True
-					for dCountry in data["countries"]:
-						if dCountry == country:
-							Csearch = True
-
 					if Ysearch == False:
-						data["years"].append(year)
-					if Csearch == False:
-						data["countries"].append(country)
+						data["subjects"].append(subject)
 
 
 				with open(json_url, 'w') as f:
@@ -136,7 +134,6 @@ def login():
 			username = request.form['username']
 			pw = request.form['password']
 			pwd = pw.encode('utf-8')
-			password = bcrypt.hashpw(pwd, bcrypt.gensalt())
 			json_url = os.path.join(SITE_ROOT, "static", "everything.json")
 			url = url_for('static',filename='csstest.css')
 			image = url_for('static',filename='logo1.png')
@@ -144,8 +141,9 @@ def login():
 			data = json.loads(ro.read())
 			for user in data["users"]:
 				username1 = user["username"]
-				password1 = user["password"]
-				if(password1 == password and username1 == username):
+				pwd1 = user["password"]
+				password1 = pw.encode('utf-8')
+				if(password1 == bcrypt.hashpw(pwd,password1) and username1 == username):
 	#			if( password1 == pw and username1 == username):
 					session['logged_in'] = True
 					session['CURRENT_USER'] = user
@@ -295,7 +293,7 @@ def register():
 			ppic = url_for('static',filename = fname)
 		if username != '' and pw != '':
 			if pw == pw2:
-				user = {'username':username,'password':password,'following':[],'posts':[],'Ppic':ppic}
+				user = {'username':username,'password':password,'following':[],'Ppic':ppic}
 				with open(json_url) as f:
 					data = json.load(f)
 
