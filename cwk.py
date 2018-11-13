@@ -90,26 +90,27 @@ def upload():
 				fname = f.filename
 				f.save(os.path.join(app.config['static'], fname))	
 				img = url_for('static',filename = fname)	
-				name = request.form['uplName']
-				subject = request.form['uplSubject']
-				description = request.form['uplDescription']
-				user = session.get('CURRENT_USER')
-				post = {'name':name, 'subject':subject, 'author':user['username'], 'description':description, 'img':img}
-				with open(json_url) as f:
-					data = json.load(f)
-					data["posts"].append(post)
-					for dSubject in data["subjects"]:
-						if dSubject == subject:
-							Ysearch = True
-					if Ysearch == False:
-						data["subjects"].append(subject)
+			
+			name = request.form['uplName']
+			subject = request.form['uplSubject']
+			description = request.form['uplDescription']
+			user = session.get('CURRENT_USER')
+			post = {'name':name, 'subject':subject, 'author':user['username'], 'description':description, 'img':img}
+			with open(json_url) as f:
+				data = json.load(f)
+				data["posts"].append(post)
+				for dSubject in data["subjects"]:
+					if dSubject == subject:
+						Ysearch = True
+				if Ysearch == False:
+					data["subjects"].append(subject)
 
 
-				with open(json_url, 'w') as f:
-					json.dump(data, f)
+			with open(json_url, 'w') as f:
+				json.dump(data, f)
 
 
-				return redirect("/all/")
+			return redirect("/all/")
 
 		else:
 				url = url_for('static',filename='csstest.css')
@@ -417,7 +418,6 @@ def User():
 		ro = open(json_url, "r")
 		data = json.loads(ro.read())
 		entries = data["users"]
-		entries = [int(x) for x in entries]
 		entries.sort()
 		title = "Search by user"
 		return render_template('template3.html', results = entries, title = title, csssheet = url, image = image,user = session.get('CURRENT_USER'))
