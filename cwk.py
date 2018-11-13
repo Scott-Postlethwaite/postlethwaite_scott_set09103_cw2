@@ -140,14 +140,13 @@ def login():
 			ro = open(json_url, "r")
 			data = json.loads(ro.read())
 			for user in data["users"]:
-				username1 = user["username"]
-				pwd1 = user["password"]
-				password1 = pw.encode('utf-8')
-				if(password1 == bcrypt.hashpw(pwd,password1) and username1 == username):
-	#			if( password1 == pw and username1 == username):
-					session['logged_in'] = True
-					session['CURRENT_USER'] = user
-					return redirect("/home/")
+					username1 = user["username"]
+					pwd1 = user["password"]
+					password1 = pwd1.encode('utf-8')
+					if(password1 == bcrypt.hashpw(pwd, password1) and username1 == username):
+						session['logged_in'] = True
+						session['CURRENT_USER'] = user
+						return redirect("/home/")
 
 			if  loggedIn == False:
 				title = "Incorrect details"
