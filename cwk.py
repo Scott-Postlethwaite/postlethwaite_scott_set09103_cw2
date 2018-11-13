@@ -230,7 +230,7 @@ def Following():
 						if post["subject"] == follows:
 							results.append(post)
 							searched = True
-						if post["user"] == follows:
+						if post["author"] == follows:
 							results.append(post)
 							searched = True
 		if searched == True:
@@ -406,9 +406,10 @@ def Help():
 @app.route("/user/",methods=['POST','GET'])
 @app.route("/User/",methods=['POST','GET'])
 def User():
+	Ysearch = False
 	searched = False
 	results = []
-	user = request.args.get('user', '')
+	Suser = request.args.get('user', '')
 	if request.method == 'POST':
 		if request.form['submit_button'] == 'Follow':
 			SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
@@ -420,10 +421,10 @@ def User():
 			for dUser in data["users"]:
 				if dUser["username"] == session.get('CURRENT_USER')['username']:
 					for follows in dUser["following"]:
-						if follows == user:
+						if follows == Suser:
 							Ysearch = True
 				if Ysearch == False:
-					user["following"].append(user)
+					dUser["following"].append(Suser)
 
 			with open(json_url, 'w') as f:
 				json.dump(data, f)
@@ -438,12 +439,12 @@ def User():
 			for dUser in data["users"]:
 				if dUser["username"] == session.get('CURRENT_USER')['username']:
 					for follows in dUser["following"]:
-						if follows == user:
-							user["following"].remove(user)
+						if follows == Suser:
+							dUser["following"].remove(user)
 
 			with open(json_url, 'w') as f:
 				json.dump(data, f)		
-		return redirect('/user/?user='user)
+		return redirect('/user/?user=',user)
 	
 	else:
 		if user == '':
@@ -467,13 +468,13 @@ def User():
 				ro = open(json_url, "r")
 				data = json.loads(ro.read())
 				for Ruser in data["users"]:
-					if Ruser["username"] == user:
+					if Ruser["username"] == Suser:
 						searched = True
 						profilePic = Ruser['Ppic']
 						name = Ruser['username']
 						bio = Ruser['bio']
 				for post in data["posts"]:
-					if post["author"] == user:
+					if post["author"] == Suser:
 						searched = True
 						results.append(post)
 				if searched == True:
