@@ -266,7 +266,7 @@ def All():
 	data = json.loads(ro.read())
 	results = data["posts"]
 	results.sort()
-	return  render_template('template5.html', results = results, csssheet = url, image = image)
+	return  render_template('template5.html', results = results, csssheet = url, image = image,user=session.get('CURRENT_USER'))
 
 
 @app.route("/register",methods=['POST','GET'])
@@ -345,7 +345,7 @@ def page_not_found(error):
 	title = "I'm sorry we couldn't find that"
 	result = 'The page you requested does not exist. If you are having trouble finding things, try navigating using the alien head. If you think it should exist then add it using our new upload feature!'
 
-	return render_template('template2.html', title = title, result = result, csssheet = url, image = image)
+	return render_template('template2.html', title = title, result = result, csssheet = url, image = image,user=session.get('CURRENT_USER'))
 
 
 
@@ -363,7 +363,7 @@ def page_not_found(error):
         title = "Something went wrong"
         result = "I'm sorry, I appear to be experiencing some issues with your request at the moment. Please try again later"
 
-        return render_template('template2.html', title = title, result = result, csssheet = url, image = image)
+        return render_template('template2.html', title = title, result = result, csssheet = url, image = image,user=session.get('CURRENT_USER'))
 
 
 @app.errorhandler(500)
@@ -379,7 +379,7 @@ def page_not_found(error):
         title = "Something went wrong"
         result = "I'm sorry, I appear to be experiencing some issues with your request at the moment. Please try again later"
 
-        return render_template('template2.html', title = title, result = result, csssheet = url, image = image)
+        return render_template('template2.html', title = title, result = result, csssheet = url, image = image,user=session.get('CURRENT_USER'))
 
 
 
@@ -396,7 +396,7 @@ def Help():
         title = "Navigation Tips"
         result = "The menu is hidden under the alien head. Just hover your mouse over it and the menu will appear. You can search for sightings by name, year or country of origin using our search feature or you can display all. If you would like to report a sighting you can by registering an account with us and using our upload feature!"
 
-        return render_template('template2.html', title = title, result = result, csssheet = url, image = image)
+        return render_template('template2.html', title = title, result = result, csssheet = url, image = image,user=session.get('CURRENT_USER'))
 
 
 

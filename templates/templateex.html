@@ -39,11 +39,15 @@
 
 	</body>
 	<div id="dropdown">
-	{% if session.user["Ppic"] != '' %}
+	{% if not session.logged_in  %}
+			<div id="logo"><img src="{{image}}"style="width:120px;height:120px;"/></div>
+                        {% else %}
+                                 	{% if user["Ppic"] != '' %}
 			<div><img src="{{user["Ppic"]}}"style="width:150px;height:150px; border-radius:50%;"/></div>
 		{% else %}
 			<div id="logo"><img src="{{image}}"style="width:120px;height:120px;"/></div>
 		{% endif %}
+                {% endif %}
 
 	<div id="hiddenMenu">
 	<ul>
