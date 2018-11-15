@@ -31,6 +31,13 @@
 		<div>Subject: <a href='/subject/?subject={{result["subject"]}}'>{{result["subject"]}}</a></div>
 		<div><a href='/user/?user={{result["author"]}}'>{{result["author"]}}</a></div>
 		<div>{{result["description"]}}</div>
+		{% for comment in result['comments'] %}
+			<div><a href='/user/?user={{result["author"]}}'>{{comment["author"]}}</a></div>
+			<div>{{comment["description"]}}</div>
+		{% end for %}
+		{% if session.logged_in  %}
+			<div><a href='/comment/?comment={{result["id"]}}'>Comment</a></div>
+		{% end if %}
 		</div>
 		</div>
 	{% endfor %}

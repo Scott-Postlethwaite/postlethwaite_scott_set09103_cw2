@@ -122,7 +122,7 @@ def upload():
 			subject = request.form['uplSubject']
 			description = request.form['uplDescription']
 			user = session.get('CURRENT_USER')
-			post = {'name':name, 'subject':subject, 'author':user['username'], 'description':description, 'img':img}
+			post = {'name':name, subject=subject, author=user['username'], description=description, img=img}
 			db.session.add(post)
 			db.session.commit()
 			return redirect("/all/")
@@ -302,7 +302,7 @@ def register():
 			ppic = url_for('static',filename = fname)
 		if username != '' and pw != '':
 			if pw == pw2:
-				user = {'username':username,'password':password,'following':[],'Ppic':ppic, 'bio':bio}
+				user = {username=username,password=password,following=[],Ppic=ppic, bio=bio}
 				db.session.add(user)
 				db.session.commit()
 

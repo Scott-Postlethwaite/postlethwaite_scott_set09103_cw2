@@ -95,7 +95,8 @@ def upload():
 			subject = request.form['uplSubject']
 			description = request.form['uplDescription']
 			user = session.get('CURRENT_USER')
-			post = {'name':name, 'subject':subject, 'author':user['username'], 'description':description, 'img':img, 'comments':[]}
+			id = len(data[posts])
+			post = {'id':id, 'name':name, 'subject':subject, 'author':user['username'], 'description':description, 'img':img, 'comments':[]}
 			with open(json_url) as f:
 				data = json.load(f)
 				data["posts"].append(post)
@@ -511,7 +512,11 @@ def Comment():
 		if request.method == 'POST':
 			Ysearch = False
 			Csearch = False
+			SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
 			json_url = os.path.join(SITE_ROOT, "static", "everything.json")
+			url = url_for('static',filename='csstest.css')
+			image = url_for('static',filename='logo1.png')
+			ro = open(json_url, "r")
 			if 'datafile' not in request.files:
 				img = ''
 			else:
