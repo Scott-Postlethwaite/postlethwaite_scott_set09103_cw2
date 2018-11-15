@@ -91,14 +91,14 @@ def upload():
 				f.save(os.path.join(app.config['static'], fname))	
 				img = url_for('static',filename = fname)	
 			
-			name = request.form['uplName']
-			subject = request.form['uplSubject']
-			description = request.form['uplDescription']
-			user = session.get('CURRENT_USER')
-			id = len(data[posts])
-			post = {'id':id, 'name':name, 'subject':subject, 'author':user['username'], 'description':description, 'img':img, 'comments':[]}
 			with open(json_url) as f:
 				data = json.load(f)
+				name = request.form['uplName']
+				subject = request.form['uplSubject']
+				description = request.form['uplDescription']
+				user = session.get('CURRENT_USER')
+				id = len(data[posts])
+				post = {'id':id, 'name':name, 'subject':subject, 'author':user['username'], 'description':description, 'img':img, 'comments':[]}
 				data["posts"].append(post)
 				for dSubject in data["subjects"]:
 					if dSubject == subject:
