@@ -1,7 +1,9 @@
 #coding: utf-8
 import bcrypt
 import os
+from datetime import datetime
 from flask import Flask, Markup, request, render_template, redirect, json, url_for, jsonify, Response, session, abort
+from flask_sqlalchemy import SQLAlchemy
 from functools import wraps
 app = Flask(__name__)
 
@@ -10,7 +12,32 @@ static = os.path.join(SITE_ROOT, 'static')
 app.config['static'] = static
 app.config['SECRET_KEY'] = os.urandom(24)
 app.config['SESSION_TYPE'] = 'filesystem'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
+db = SQLAlchemy(app)
 
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(20), unique=True, nullable=False)
+    Ppic = db.Column(db.String(20), nullable=False, default='default.jpg')
+    password = db.Column(db.String(60), nullable=False)
+    posts = db.relationship('Post', backref='author', lazy=True)
+	bio = db.Column(db.String(150))
+
+	 def __repr__(self):
+        return f"User('{self.username}', '{self.bio}', '{self.Ppic}')"
+	
+	
+class Post(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    description = db.Column(db.Text, nullable=False)
+    user = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+	image = db.Column(db.String(20), nullable=False, default='default.jpg')
+	
+    def __repr__(self):
+        return f"Post('{self.title}','{self.user}','{self.content}', '{self.date_posted}')"
+	
 @app.route("/home/", methods=['POST','GET'])
 def home():
 	if request.method == 'POST':
@@ -95,21 +122,9 @@ def upload():
 			subject = request.form['uplSubject']
 			description = request.form['uplDescription']
 			user = session.get('CURRENT_USER')
-			post = {'name':name, 'subject':subject, 'author':user['username'], 'description':description, 'img':img, 'comments':[]}
-			with open(json_url) as f:
-				data = json.load(f)
-				data["posts"].append(post)
-				for dSubject in data["subjects"]:
-					if dSubject == subject:
-						Ysearch = True
-				if Ysearch == False:
-					data["subjects"].append(subject)
-
-
-			with open(json_url, 'w') as f:
-				json.dump(data, f)
-
-
+			post = {'name':name, 'subject':subject, 'author':user['username'], 'description':description, 'img':img}
+			db.session.add(post)
+			db.session.commit()
 			return redirect("/all/")
 
 		else:
@@ -130,23 +145,17 @@ def login():
         if request.method == 'POST':
 		loggedIn =False
 		if request.form['username'] != '':
-			SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
 			username = request.form['username']
 			pw = request.form['password']
 			pwd = pw.encode('utf-8')
-			json_url = os.path.join(SITE_ROOT, "static", "everything.json")
 			url = url_for('static',filename='csstest.css')
 			image = url_for('static',filename='logo1.png')
 			ro = open(json_url, "r")
-			data = json.loads(ro.read())
-			for user in data["users"]:
-					username1 = user["username"]
-					pwd1 = user["password"]
-					password1 = pwd1.encode('utf-8')
-					if(password1 == bcrypt.hashpw(pwd, password1) and username1 == username):
-						session['logged_in'] = True
-						session['CURRENT_USER'] = user
-						return redirect("/home/")
+			user = User.query.filter_by(email=form.email.data).first()
+			if(password1 == bcrypt.hashpw(pwd, password1) and username1 == username):
+				session['logged_in'] = True
+				session['CURRENT_USER'] = user
+				return redirect("/home/")
 
 			if  loggedIn == False:
 				title = "Incorrect details"
@@ -278,7 +287,6 @@ def register():
 
 	if request.method == 'POST':
 		Ysearch = False
-		json_url = os.path.join(SITE_ROOT, "static", "everything.json")
 		username = request.form['username']
 		pw = request.form['password']
 		pwd = pw.encode('utf-8')
@@ -295,23 +303,10 @@ def register():
 		if username != '' and pw != '':
 			if pw == pw2:
 				user = {'username':username,'password':password,'following':[],'Ppic':ppic, 'bio':bio}
-				with open(json_url) as f:
-					data = json.load(f)
+				db.session.add(user)
+				db.session.commit()
 
-					for user1 in data["users"]:
-						if user1["username"] == username:
-							Ysearch = True
-					if Ysearch == False:
-						data["users"].append(user)
-						with open(json_url, 'w') as f:
-							json.dump(data, f)
-						return redirect("/home/")
-
-					if  Ysearch == True:
-						title = "Username already in use"
-						result = "I'm sorry, the username you have requested is unavailable. Please try another."
-
-						return render_template('template2.html', title = title, result = result, csssheet = url, image = image)
+				return render_template('template2.html', title = title, result = result, csssheet = url, image = image)
 			else:
 				title = "Passwords don't match"
 				result = "I'm sorry, your passwords do not match. Please try again."
@@ -444,7 +439,7 @@ def User():
 
 			with open(json_url, 'w') as f:
 				json.dump(data, f)		
-		return redirect('/following/')
+		return redirect('/user/?user=',user)
 	
 	else:
 		if user == '':
@@ -488,70 +483,6 @@ def User():
 				return render_template('template2.html', title = result, csssheet = url, image = image,user = session.get('CURRENT_USER'))
 
 
-				
-				
-				
-				
-				
-				
-				
-	
-				
-				
-				
-				
-				
-@app.route("/comment/",methods=['POST','GET'])
-@app.route("/Comment/",methods=['POST','GET'])
-def Comment():
-	postID = request.args.get('comment', '')			
-	if not session.get('logged_in'):
-		return login()
-	else:
-		if request.method == 'POST':
-			Ysearch = False
-			Csearch = False
-			json_url = os.path.join(SITE_ROOT, "static", "everything.json")
-			if 'datafile' not in request.files:
-				img = ''
-			else:
-				f = request.files['datafile']
-				fname = f.filename
-				f.save(os.path.join(app.config['static'], fname))	
-				img = url_for('static',filename = fname)	
-			
-			name = request.form['uplName']
-			subject = request.form['uplSubject']
-			description = request.form['uplDescription']
-			user = session.get('CURRENT_USER')
-			comment = {'name':name, 'subject':subject, 'author':user['username'], 'description':description, 'img':img}
-			data = json.loads(ro.read())
-			for post in data["posts"]:
-				if post["id"] == postID:
-					post["comments"].append(comment)
-			with open(json_url, 'w') as f:
-				json.dump(data, f)		
-			return redirect('/all/')
-
-		else:
-				url = url_for('static',filename='csstest.css')
-				image = url_for('static',filename='logo1.png')
-
-
-				return render_template('uplTemplate.html', csssheet = url, image = image,user = session.get('CURRENT_USER'))
-
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
 
 
 
