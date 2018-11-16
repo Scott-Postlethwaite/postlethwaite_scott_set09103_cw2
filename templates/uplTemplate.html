@@ -15,14 +15,28 @@
 
 
 <form action="" name="form"  method="POST" enctype="multipart/form-data">
+{% if type == 'post' %}
 <p class="center">Title:</p>
-<textarea type="text" name="uplName" rows="1" cols = "30" class="center"></textarea><br />
+<textarea type="text" name="uplName" rows="1" cols = "30" class="center">
+{% if type == edit %}
+{% result['title']%}
+{% endif %}</textarea><br />
 
 <p class="center">Subject:</p>
-<textarea type="text" name="uplSubject" rows="1" cols = "30" class="center"></textarea><br />
+<textarea type="text" name="uplSubject" rows="1" cols = "30" class="center">
+{% if type == edit %}
+{% result['Subject']%}
+{% endif %}</textarea><br />
 
 <p class="center">Description:</p>
-  <textarea name="uplDescription" rows="15" cols="100" class="center"></textarea><br />
+{% endif %}
+{% if type == 'comment'%}
+<p class="center">Comment:</p>
+{% endif %}
+  <textarea name="uplDescription" rows="15" cols="100" class="center">
+  {% if type == edit %}
+{% result['description']%}
+{% endif %}</textarea><br />
 <input type="file" class="center"  name="datafile"/>
   <input type="submit" name="submit" id="submit"  class="center"/>
 </form>

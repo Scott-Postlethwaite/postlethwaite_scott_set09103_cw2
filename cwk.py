@@ -97,7 +97,7 @@ def upload():
 				subject = request.form['uplSubject']
 				description = request.form['uplDescription']
 				user = session.get('CURRENT_USER')
-				id = len(data[posts])
+				id = len(data['posts'])
 				post = {'id':id, 'name':name, 'subject':subject, 'author':user['username'], 'description':description, 'img':img, 'comments':[]}
 				data["posts"].append(post)
 				for dSubject in data["subjects"]:
@@ -116,9 +116,9 @@ def upload():
 		else:
 				url = url_for('static',filename='csstest.css')
 				image = url_for('static',filename='logo1.png')
+				type='post'
 
-
-				return render_template('uplTemplate.html', csssheet = url, image = image,user = session.get('CURRENT_USER'))
+				return render_template('uplTemplate.html',type=type, csssheet = url, image = image,user = session.get('CURRENT_USER'))
 
 
 @app.route('/login',methods=['POST','GET'])
@@ -448,7 +448,7 @@ def User():
 		return redirect('/following/')
 	
 	else:
-		if user == '':
+		if Suser == '':
 			SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
 			json_url = os.path.join(SITE_ROOT, "static", "everything.json")
 			url = url_for('static',filename='csstest.css')
@@ -510,6 +510,42 @@ def Comment():
 		return login()
 	else:
 		if request.method == 'POST':
+			SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
+			json_url = os.path.join(SITE_ROOT, "static", "everything.json")
+			url = url_for('static',filename='csstest.css')
+			image = url_for('static',filename='logo1.png')
+			ro = open(json_url, "r")
+			description = request.form['uplDescription']
+			user = session.get('CURRENT_USER')
+			comment = {'author':user['username'], 'description':description}
+			data = json.loads(ro.read())
+			for post in data["posts"]:
+				if int(post["id"]) == int(postID):
+					post["comments"].append(comment)
+			with open(json_url, 'w') as f:
+				json.dump(data, f)		
+			return redirect('/all/')
+
+		else:
+				url = url_for('static',filename='csstest.css')
+				image = url_for('static',filename='logo1.png')
+				type = 'comment'
+
+				return render_template('uplTemplate.html',type=type, csssheet = url, image = image,user = session.get('CURRENT_USER'))
+
+				
+				
+				
+				
+				
+@app.route("/edit/",methods=['POST','GET'])
+@app.route("/Edit/",methods=['POST','GET'])
+def Edit():
+	postID = request.args.get('edit', '')			
+	if not session.get('logged_in'):
+		return login()
+	else:
+		if request.method == 'POST':
 			Ysearch = False
 			Csearch = False
 			SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
@@ -524,29 +560,34 @@ def Comment():
 				fname = f.filename
 				f.save(os.path.join(app.config['static'], fname))	
 				img = url_for('static',filename = fname)	
-			
-			name = request.form['uplName']
-			subject = request.form['uplSubject']
-			description = request.form['uplDescription']
 			user = session.get('CURRENT_USER')
-			comment = {'name':name, 'subject':subject, 'author':user['username'], 'description':description, 'img':img}
 			data = json.loads(ro.read())
 			for post in data["posts"]:
 				if post["id"] == postID:
-					post["comments"].append(comment)
+					post['name'] = request.form['uplName']
+					post['subject'] = request.form['uplSubject']
+					post['description'] = request.form['uplDescription']
+					post['img'] = img
 			with open(json_url, 'w') as f:
 				json.dump(data, f)		
 			return redirect('/all/')
 
 		else:
-				url = url_for('static',filename='csstest.css')
-				image = url_for('static',filename='logo1.png')
+			SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
+			json_url = os.path.join(SITE_ROOT, "static", "everything.json")
+			url = url_for('static',filename='csstest.css')
+			image = url_for('static',filename='logo1.png')
+			ro = open(json_url, "r")
+			type = 'edit'
+			data = json.loads(ro.read())
+			result=''
+				for post in data["posts"]:
+					if int(post["id"]) == int(postID):
+						result = post
+					
 
+				return render_template('uplTemplate.html',type=type, csssheet = url, image = image,user = session.get('CURRENT_USER'), result=result)
 
-				return render_template('uplTemplate.html', csssheet = url, image = image,user = session.get('CURRENT_USER'))
-
-				
-				
 				
 				
 				
