@@ -42,6 +42,9 @@
 		{% if session.logged_in  %}
 			<div><a href='/comment/?comment={{result["id"]}}'>Comment</a></div>
 		{% endif %}
+		{% if user['username'] == result['author']  %}
+			<div><a href='/edit/?edit={{result["id"]}}'>Edit</a>   <a href='/delete/?delete={{result["id"]}}'>Delete</a></div>
+		{% endif %}
 		</div>
 		</div>
 	{% endfor %}

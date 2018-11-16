@@ -546,8 +546,7 @@ def Edit():
 		return login()
 	else:
 		if request.method == 'POST':
-			Ysearch = False
-			Csearch = False
+			search = False
 			SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
 			json_url = os.path.join(SITE_ROOT, "static", "everything.json")
 			url = url_for('static',filename='csstest.css')
@@ -564,14 +563,29 @@ def Edit():
 			data = json.loads(ro.read())
 			for post in data["posts"]:
 				if int(post["id"]) == int(postID):
-					print 'its happening'
-					post['name'] = request.form['uplName']
-					post['subject'] = request.form['uplSubject']
-					post['description'] = request.form['uplDescription']
-					post['img'] = img
-			with open(json_url, 'w') as f:
-				json.dump(data, f)		
-			return redirect('/all/')
+					if user["username"] == post["author"]:
+						post['name'] = request.form['uplName']
+						post['subject'] = request.form['uplSubject']
+						post['description'] = request.form['uplDescription']
+						post['img'] = img
+						search = True
+			if search == True:
+				with open(json_url, 'w') as f:
+					json.dump(data, f)		
+				return redirect('/all/')
+			else:
+				url = url_for('static',filename='csstest.css')
+				image = url_for('static',filename='logo1.png')
+				SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
+				json_url = os.path.join(SITE_ROOT, "static", "everything.json")
+
+				ro = open(json_url, "r")
+				data = json.loads(ro.read())
+				title = "Cannot Edit"
+				result = "You cannot edit this post."
+
+				return render_template('template2.html', title = title, result = result, csssheet = url, image = image,user=session.get('CURRENT_USER'))
+					
 
 		else:
 			SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
@@ -595,9 +609,44 @@ def Edit():
 				
 				
 				
-				
-				
-				
+@app.route("/delete/")
+@app.route("/delete/")
+def Delete():
+	postID = request.args.get('delete', '')			
+	if not session.get('logged_in'):
+		return login()
+	else:
+		search = False
+		SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
+		json_url = os.path.join(SITE_ROOT, "static", "everything.json")
+		url = url_for('static',filename='csstest.css')
+		image = url_for('static',filename='logo1.png')
+		ro = open(json_url, "r")
+		user = session.get('CURRENT_USER')
+		data = json.loads(ro.read())
+		for post in data["posts"]:
+			if int(post["id"]) == int(postID):
+				if user["username"] == post["author"]:
+					data.pop(post)
+					search = True
+		
+		if search == True:
+			with open(json_url, 'w') as f:
+				json.dump(data, f)		
+			return redirect('/all/')								
+		else:
+			url = url_for('static',filename='csstest.css')
+			image = url_for('static',filename='logo1.png')
+			SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
+			json_url = os.path.join(SITE_ROOT, "static", "everything.json")
+
+			ro = open(json_url, "r")
+			data = json.loads(ro.read())
+			title = "Wrong user logged in"
+			result = "You cannot delete this post."
+
+			return render_template('template2.html', title = title, result = result, csssheet = url, image = image,user=session.get('CURRENT_USER'))
+					
 				
 
 
