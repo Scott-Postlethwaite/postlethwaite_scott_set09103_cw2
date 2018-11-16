@@ -7,7 +7,13 @@
 		<div id="notBody">
 <div class = "posts">
 <p class = "center">
-	 <h1 class = "center">Post your theory</h1>    
+{% if type == 'post' %}
+	 <h1 class = "center">Post your theory</h1>
+{% elif type == 'edit' %}	 
+	 <h1 class = "center">Edit your theory</h1>
+{% elif type == 'comment' %}	 
+	 <h1 class = "center">Comment on this theory</h1>
+{% endif %}
  </p>
 
 
@@ -19,23 +25,23 @@
 <p class="center">Title:</p>
 <textarea type="text" name="uplName" rows="1" cols = "30" class="center">
 {% if type == edit %}
-{% result['title']%}
+	{{result['title']}}
 {% endif %}</textarea><br />
 
 <p class="center">Subject:</p>
 <textarea type="text" name="uplSubject" rows="1" cols = "30" class="center">
 {% if type == edit %}
-{% result['Subject']%}
+{{result['Subject']}}
 {% endif %}</textarea><br />
 
 <p class="center">Description:</p>
 {% endif %}
-{% if type == 'comment'%}
+{% if type == 'comment' %}
 <p class="center">Comment:</p>
 {% endif %}
   <textarea name="uplDescription" rows="15" cols="100" class="center">
   {% if type == edit %}
-{% result['description']%}
+{{result['description']}}
 {% endif %}</textarea><br />
 <input type="file" class="center"  name="datafile"/>
   <input type="submit" name="submit" id="submit"  class="center"/>

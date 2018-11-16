@@ -581,14 +581,14 @@ def Edit():
 			type = 'edit'
 			data = json.loads(ro.read())
 			result=''
-				for post in data["posts"]:
-					if int(post["id"]) == int(postID):
-						result = post
-					
-
-				return render_template('uplTemplate.html',type=type, csssheet = url, image = image,user = session.get('CURRENT_USER'), result=result)
-
+			for post in data["posts"]:
+				if int(post["id"]) == int(postID):
+					result = post
 				
+
+			return render_template('uplTemplate.html',type=type, csssheet = url, image = image,user = session.get('CURRENT_USER'), result=result)
+
+			
 				
 				
 				
