@@ -563,7 +563,8 @@ def Edit():
 			user = session.get('CURRENT_USER')
 			data = json.loads(ro.read())
 			for post in data["posts"]:
-				if post["id"] == postID:
+				if int(post["id"]) == int(postID):
+					print 'its happening'
 					post['name'] = request.form['uplName']
 					post['subject'] = request.form['uplSubject']
 					post['description'] = request.form['uplDescription']
