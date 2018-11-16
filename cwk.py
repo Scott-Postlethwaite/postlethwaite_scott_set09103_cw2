@@ -627,7 +627,7 @@ def Delete():
 		for post in data["posts"]:
 			if int(post["id"]) == int(postID):
 				if user["username"] == post["author"]:
-					data.pop(post)
+					del data["posts"][int(postID)]
 					search = True
 		
 		if search == True:
