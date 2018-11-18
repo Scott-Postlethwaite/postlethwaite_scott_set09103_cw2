@@ -13,13 +13,11 @@
 	<div class = "center">
 		<div>{{bio}}</div>
 </div>    
-<form action="" name="form"  method="POST" enctype="multipart/form-data">
 {% if Uname in user['following'] %}
-	<input type="submit" name="submit_button" value="Unfollow">
+	<div><a href='/unfollow/?wunfollow={{Uname}}'>Unfollow</a></div>
 {% else %}
-	<input type="submit" name="submit_button" value="Follow">
+	<div><a href='/follow/?follow={{Uname}}'>Follow</a></div>
 {% endif %}
-</form>
 	</div>
  </p>
 </div>
@@ -35,9 +33,13 @@
 		<div>Subject: <a href='/subject/?subject={{result["subject"]}}'>{{result["subject"]}}</a></div>
 		<div><a href='/user/?user={{result["author"]}}'>{{result["author"]}}</a></div>
 		<div>{{result["description"]}}</div>
+		</div>
+		<div class = "posts">
 				{% for comment in result['comments'] %}
+			<div class = "posts">	
 			<div><a href='/user/?user={{result["author"]}}'>{{comment["author"]}}</a></div>
 			<div>{{comment["description"]}}</div>
+			</div>
 		{% endfor %}
 		{% if session.logged_in  %}
 			<div><a href='/comment/?comment={{result["id"]}}'>Comment</a></div>

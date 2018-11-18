@@ -15,9 +15,13 @@
 		<div>Subject: <a href='/subject/?subject={{result["subject"]}}'>{{result["subject"]}}</a></div>
 		<div><a href='/user/?user={{result["author"]}}'>{{result["author"]}}</a></div>
 		<div>{{result["description"]}}</div>
+		</div>
+		<div class = "posts">
 		{% for comment in result['comments'] %}
-			<div><a href='/user/?user={{comment["author"]}}'>{{comment["author"]}}</a></div>
+			<div class = "posts">	
+			<div><a href='/user/?user={{result["author"]}}'>{{comment["author"]}}</a></div>
 			<div>{{comment["description"]}}</div>
+			</div>
 		{% endfor %}
 		{% if session.logged_in  %}
 			<div><a href='/comment/?comment={{result["id"]}}'>Comment</a></div>

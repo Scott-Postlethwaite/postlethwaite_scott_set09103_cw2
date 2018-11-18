@@ -1,43 +1,50 @@
 #coding: utf-8
 import bcrypt
 import os
-from datetime import datetime
+import sqlite3
 from flask import Flask, Markup, request, render_template, redirect, json, url_for, jsonify, Response, session, abort
-from flask_sqlalchemy import SQLAlchemy
 from functools import wraps
+
 app = Flask(__name__)
+
+DATABASE = sqlite3.connect('database.db')
+
+DATABASE.execute('CREATE TABLE users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT, Ppic TEXT, bio TEXT, following TEXT)')
+DATABASE.execute('CREATE TABLE posts (id INTEGER PRIMARY KEY AUTOINCREMENT, author TEXT, title TEXT, description TEXT, subject TEXT, img TEXT, comments TEXT)')
+DATABASE.execute('CREATE TABLE comments (postId INTEGER, author TEXT, description TEXT)')
+
+DATABASE.close()
+
 
 SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
 static = os.path.join(SITE_ROOT, 'static')
 app.config['static'] = static
 app.config['SECRET_KEY'] = os.urandom(24)
 app.config['SESSION_TYPE'] = 'filesystem'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
-db = SQLAlchemy(app)
 
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(20), unique=True, nullable=False)
-    Ppic = db.Column(db.String(20), nullable=False, default='default.jpg')
-    password = db.Column(db.String(60), nullable=False)
-    posts = db.relationship('Post', backref='author', lazy=True)
-	bio = db.Column(db.String(150))
+def get_db():
+    db = getattr(g, '_database', None)
+    if db is None:
+        db = g._database = sqlite3.connect(DATABASE)
+        db.row_factory = sqlite3.Row
+    return db
 
-	 def __repr__(self):
-        return f"User('{self.username}', '{self.bio}', '{self.Ppic}')"
-	
-	
-class Post(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    description = db.Column(db.Text, nullable=False)
-    user = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-	image = db.Column(db.String(20), nullable=False, default='default.jpg')
-	
-    def __repr__(self):
-        return f"Post('{self.title}','{self.user}','{self.content}', '{self.date_posted}')"
-	
+def query_db(query, args=(), one=False):
+    cur = get_db().execute(query, args)
+    rv = cur.fetchall()
+    cur.close()
+    return (rv[0] if rv else None) if one else rv
+
+def change_db(query,args=()):
+    cur = get_db().execute(query, args)
+    get_db().commit()
+    cur.close()
+
+@app.teardown_appcontext
+def close_connection(exception):
+    db = getattr(g, '_database', None)
+    if db is not None:
+        db.close()
 @app.route("/home/", methods=['POST','GET'])
 def home():
 	if request.method == 'POST':
@@ -89,14 +96,7 @@ def home():
 
 		url = url_for('static',filename='csstest.css')
 		image = url_for('static',filename='logo1.png')
-		SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
-		json_url = os.path.join(SITE_ROOT, "static", "everything.json")
-		url = url_for('static',filename='csstest.css')
-		image = url_for('static',filename='logo1.png')
-		ro = open(json_url, "r")
-		data = json.loads(ro.read())
-		results = data["posts"]
-		results.sort()
+		results = query_db("SELECT * FROM contact")
 		return render_template('templateex.html', csssheet = url, image = image,user = session.get('CURRENT_USER'),results=results)
 
 #this allows the user to report their own sighting. They also have the option of adding an image.
@@ -109,7 +109,6 @@ def upload():
 		if request.method == 'POST':
 			Ysearch = False
 			Csearch = False
-			json_url = os.path.join(SITE_ROOT, "static", "everything.json")
 			if 'datafile' not in request.files:
 				img = ''
 			else:
@@ -122,17 +121,24 @@ def upload():
 			subject = request.form['uplSubject']
 			description = request.form['uplDescription']
 			user = session.get('CURRENT_USER')
-			post = {'name':name, subject=subject, author=user['username'], description=description, img=img}
-			db.session.add(post)
-			db.session.commit()
+			id = len(data['posts'])
+			with sql.connect("database.db") as con:
+				cur = con.cursor()
+				
+				cur.execute("INSERT INTO posts (id,name,subject,author,description,img,comments) 
+				   VALUES (?,?,?,?,?,?)",(id,name,subject,user['username'],description, img, comments) )
+				
+				con.commit()
+
+
 			return redirect("/all/")
 
 		else:
 				url = url_for('static',filename='csstest.css')
 				image = url_for('static',filename='logo1.png')
+				type='post'
 
-
-				return render_template('uplTemplate.html', csssheet = url, image = image,user = session.get('CURRENT_USER'))
+				return render_template('uplTemplate.html',type=type, csssheet = url, image = image,user = session.get('CURRENT_USER'))
 
 
 @app.route('/login',methods=['POST','GET'])
@@ -145,17 +151,23 @@ def login():
         if request.method == 'POST':
 		loggedIn =False
 		if request.form['username'] != '':
+			SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
 			username = request.form['username']
 			pw = request.form['password']
 			pwd = pw.encode('utf-8')
+			json_url = os.path.join(SITE_ROOT, "static", "everything.json")
 			url = url_for('static',filename='csstest.css')
 			image = url_for('static',filename='logo1.png')
 			ro = open(json_url, "r")
-			user = User.query.filter_by(email=form.email.data).first()
-			if(password1 == bcrypt.hashpw(pwd, password1) and username1 == username):
-				session['logged_in'] = True
-				session['CURRENT_USER'] = user
-				return redirect("/home/")
+			data = json.loads(ro.read())
+			for user in data["users"]:
+					username1 = user["username"]
+					pwd1 = user["password"]
+					password1 = pwd1.encode('utf-8')
+					if(password1 == bcrypt.hashpw(pwd, password1) and username1 == username):
+						session['logged_in'] = True
+						session['CURRENT_USER'] = user
+						return redirect("/home/")
 
 			if  loggedIn == False:
 				title = "Incorrect details"
@@ -271,10 +283,7 @@ def All():
 	json_url = os.path.join(SITE_ROOT, "static", "everything.json")
 	url = url_for('static',filename='csstest.css')
 	image = url_for('static',filename='logo1.png')
-	ro = open(json_url, "r")
-	data = json.loads(ro.read())
-	results = data["posts"]
-	results.sort()
+	results = query_db("SELECT * FROM contact")
 	return  render_template('template5.html', results = results, csssheet = url, image = image,user=session.get('CURRENT_USER'))
 
 
@@ -293,6 +302,7 @@ def register():
 		password = bcrypt.hashpw(pwd, bcrypt.gensalt())
 		pw2 = request.form['password2']
 		bio = request.form['uplBio']
+		following = []
 		if 'datafile' not in request.files:
 			ppic = ''
 		else:
@@ -302,11 +312,9 @@ def register():
 			ppic = url_for('static',filename = fname)
 		if username != '' and pw != '':
 			if pw == pw2:
-				user = {username=username,password=password,following=[],Ppic=ppic, bio=bio}
-				db.session.add(user)
-				db.session.commit()
-
-				return render_template('template2.html', title = title, result = result, csssheet = url, image = image)
+				with sql.connect("database.db") as con:
+					values=[user["username"],user["password"],user["bio"],user["Ppic"]]
+					change_db("INSERT INTO contact (username,password,bio,Ppic) VALUES (?,?,?,?)",values)
 			else:
 				title = "Passwords don't match"
 				result = "I'm sorry, your passwords do not match. Please try again."
@@ -439,10 +447,10 @@ def User():
 
 			with open(json_url, 'w') as f:
 				json.dump(data, f)		
-		return redirect('/user/?user=',user)
+		return redirect('/following/')
 	
 	else:
-		if user == '':
+		if Suser == '':
 			SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
 			json_url = os.path.join(SITE_ROOT, "static", "everything.json")
 			url = url_for('static',filename='csstest.css')
@@ -483,6 +491,162 @@ def User():
 				return render_template('template2.html', title = result, csssheet = url, image = image,user = session.get('CURRENT_USER'))
 
 
+				
+				
+				
+				
+				
+				
+				
+	
+				
+				
+				
+				
+				
+@app.route("/comment/",methods=['POST','GET'])
+@app.route("/Comment/",methods=['POST','GET'])
+def Comment():
+	postID = request.args.get('comment', '')			
+	if not session.get('logged_in'):
+		return login()
+	else:
+		if request.method == 'POST':
+			url = url_for('static',filename='csstest.css')
+			image = url_for('static',filename='logo1.png')
+			ro = open(json_url, "r")
+			description = request.form['uplDescription']
+			user = session.get('CURRENT_USER')
+			with sql.connect("database.db") as con:
+				cur = con.cursor()
+				cur.execute("INSERT INTO comments (description,author,postId) 
+				VALUES (?,?,?)",(description,user['username'],postID) )
+            
+            con.commit()		
+			return redirect('/all/')
+
+		else:
+				url = url_for('static',filename='csstest.css')
+				image = url_for('static',filename='logo1.png')
+				type = 'comment'
+
+				return render_template('uplTemplate.html',type=type, csssheet = url, image = image,user = session.get('CURRENT_USER'))
+
+				
+				
+				
+				
+				
+@app.route("/edit/",methods=['POST','GET'])
+@app.route("/Edit/",methods=['POST','GET'])
+def Edit():
+	postID = request.args.get('edit', '')			
+	if not session.get('logged_in'):
+		return login()
+	else:
+		if request.method == 'POST':
+			search = False
+			SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
+			json_url = os.path.join(SITE_ROOT, "static", "everything.json")
+			url = url_for('static',filename='csstest.css')
+			image = url_for('static',filename='logo1.png')
+			ro = open(json_url, "r")
+			if 'datafile' not in request.files:
+				img = ''
+			else:
+				f = request.files['datafile']
+				fname = f.filename
+				f.save(os.path.join(app.config['static'], fname))	
+				img = url_for('static',filename = fname)	
+			user = session.get('CURRENT_USER')
+			data = json.loads(ro.read())
+			for post in data["posts"]:
+				if int(post["id"]) == int(postID):
+					if user["username"] == post["author"]:
+						post['name'] = request.form['uplName']
+						post['subject'] = request.form['uplSubject']
+						post['description'] = request.form['uplDescription']
+						post['img'] = img
+						search = True
+			if search == True:
+				with open(json_url, 'w') as f:
+					json.dump(data, f)		
+				return redirect('/all/')
+			else:
+				url = url_for('static',filename='csstest.css')
+				image = url_for('static',filename='logo1.png')
+				SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
+				json_url = os.path.join(SITE_ROOT, "static", "everything.json")
+
+				ro = open(json_url, "r")
+				data = json.loads(ro.read())
+				title = "Cannot Edit"
+				result = "You cannot edit this post."
+
+				return render_template('template2.html', title = title, result = result, csssheet = url, image = image,user=session.get('CURRENT_USER'))
+					
+
+		else:
+			SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
+			json_url = os.path.join(SITE_ROOT, "static", "everything.json")
+			url = url_for('static',filename='csstest.css')
+			image = url_for('static',filename='logo1.png')
+			ro = open(json_url, "r")
+			type = 'edit'
+			data = json.loads(ro.read())
+			result=''
+			for post in data["posts"]:
+				if int(post["id"]) == int(postID):
+					result = post
+				
+
+			return render_template('uplTemplate.html',type=type, csssheet = url, image = image,user = session.get('CURRENT_USER'), result=result)
+
+			
+				
+				
+				
+				
+				
+@app.route("/delete/")
+@app.route("/delete/")
+def Delete():
+	postID = request.args.get('delete', '')			
+	if not session.get('logged_in'):
+		return login()
+	else:
+		search = False
+		SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
+		json_url = os.path.join(SITE_ROOT, "static", "everything.json")
+		url = url_for('static',filename='csstest.css')
+		image = url_for('static',filename='logo1.png')
+		ro = open(json_url, "r")
+		user = session.get('CURRENT_USER')
+		data = json.loads(ro.read())
+		for post in data["posts"]:
+			if int(post["id"]) == int(postID):
+				if user["username"] == post["author"]:
+					change_db("DELETE FROM contact WHERE id = ?",[postID])
+					search = True
+		
+		if search == True:
+			with open(json_url, 'w') as f:
+				json.dump(data, f)		
+			return redirect('/all/')								
+		else:
+			url = url_for('static',filename='csstest.css')
+			image = url_for('static',filename='logo1.png')
+			SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
+			json_url = os.path.join(SITE_ROOT, "static", "everything.json")
+
+			ro = open(json_url, "r")
+			data = json.loads(ro.read())
+			title = "Wrong user logged in"
+			result = "You cannot delete this post."
+
+			return render_template('template2.html', title = title, result = result, csssheet = url, image = image,user=session.get('CURRENT_USER'))
+					
+				
 
 
 

@@ -648,8 +648,66 @@ def Delete():
 			return render_template('template2.html', title = title, result = result, csssheet = url, image = image,user=session.get('CURRENT_USER'))
 					
 				
+				
+				
+				
+
+				
+@app.route("/follow/")
+@app.route("/Follow/")
+def Delete():
+	postID = request.args.get('follow', '')			
+	if not session.get('logged_in'):
+		return login()
+	else:
+		search = False
+		SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
+		json_url = os.path.join(SITE_ROOT, "static", "everything.json")
+		url = url_for('static',filename='csstest.css')
+		image = url_for('static',filename='logo1.png')
+		ro = open(json_url, "r")
+		user = session.get('CURRENT_USER')
+		data = json.loads(ro.read())
+		for dUser in data["users"]:
+			if dUser["username"] == session.get('CURRENT_USER')['username']:
+				for follows in dUser["following"]:
+					if follows == Suser:
+						Ysearch = True
+				if search == False:
+					dUser["following"].append(Suser)
+
+		with open(json_url, 'w') as f:
+			json.dump(data, f)		
+		return redirect('/all/')				
 
 
+		
+@app.route("/unfollow/")
+@app.route("/Unfollow/")
+def Delete():
+	postID = request.args.get('unfollow', '')			
+	if not session.get('logged_in'):
+		return login()
+	else:
+		search = False
+		SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
+		json_url = os.path.join(SITE_ROOT, "static", "everything.json")
+		url = url_for('static',filename='csstest.css')
+		image = url_for('static',filename='logo1.png')
+		ro = open(json_url, "r")
+		user = session.get('CURRENT_USER')
+		data = json.loads(ro.read())
+		for dUser in data["users"]:
+			if dUser["username"] == session.get('CURRENT_USER')['username']:
+				for follows in dUser["following"]:
+					if follows == Suser:
+						dUser['following'].pop(follows)
+
+		with open(json_url, 'w') as f:
+			json.dump(data, f)		
+		return redirect('/all/')			
+		
+		
 
 if __name__ == "__main__":
 
