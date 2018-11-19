@@ -2,18 +2,13 @@
 import bcrypt
 import os
 import sqlite3
-from flask import Flask, Markup, request, render_template, redirect, json, url_for, jsonify, Response, session, abort
+from flask import Flask,g, Markup, request, render_template, redirect, json, url_for, jsonify, Response, session, abort
 from functools import wraps
 
 app = Flask(__name__)
 
-DATABASE = sqlite3.connect('database.db')
+DATABASE = 'database.db'
 
-DATABASE.execute('CREATE TABLE users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT, Ppic TEXT, bio TEXT, following TEXT)')
-DATABASE.execute('CREATE TABLE posts (id INTEGER PRIMARY KEY AUTOINCREMENT, author TEXT, title TEXT, description TEXT, subject TEXT, img TEXT, comments TEXT)')
-DATABASE.execute('CREATE TABLE comments (postId INTEGER, author TEXT, description TEXT)')
-
-DATABASE.close()
 
 
 SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
@@ -21,6 +16,12 @@ static = os.path.join(SITE_ROOT, 'static')
 app.config['static'] = static
 app.config['SECRET_KEY'] = os.urandom(24)
 app.config['SESSION_TYPE'] = 'filesystem'
+
+def dict_factory(cursor, row):
+    d = {}
+    for idx, col in enumerate(cursor.description):
+        d[col[0]] = row[idx]
+    return d
 
 def get_db():
     db = getattr(g, '_database', None)
@@ -145,16 +146,16 @@ def login():
         if request.method == 'POST':
 		loggedIn =False
 		if request.form['username'] != '':
-			SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
 			username = request.form['username']
 			pw = request.form['password']
 			pwd = pw.encode('utf-8')
-			json_url = os.path.join(SITE_ROOT, "static", "everything.json")
 			url = url_for('static',filename='csstest.css')
 			image = url_for('static',filename='logo1.png')
-			ro = open(json_url, "r")
-			data = json.loads(ro.read())
-			for user in data["users"]:
+			conn.row_factory = sqlite3.Row
+			c = conn.cursor()
+			c.execute('select * from users')
+			data = c.fetchall()
+			for user in data:
 					username1 = user["username"]
 					pwd1 = user["password"]
 					password1 = pwd1.encode('utf-8')
@@ -306,9 +307,9 @@ def register():
 			ppic = url_for('static',filename = fname)
 		if username != '' and pw != '':
 			if pw == pw2:
-				with sql.connect("database.db") as con:
-					values=[username,password,bio,ppic]
-					change_db("INSERT INTO posts (username,password,bio,Ppic) VALUES (?,?,?,?)",values)
+				values=[username,password,bio,ppic]
+				change_db("INSERT INTO users (username,password,bio,Ppic) VALUES (?,?,?,?)",values)
+				return 
 			else:
 				title = "Passwords don't match"
 				result = "I'm sorry, your passwords do not match. Please try again."
@@ -477,8 +478,7 @@ def Comment():
 			with sql.connect("database.db") as con:
 				cur = con.cursor()
 				cur.execute("INSERT INTO comments (description,author,postId) VALUES (?,?,?)",(description,user['username'],postID) )
-            
-            con.commit()		
+				con.commit()		
 			return redirect('/all/')
 
 		else:
@@ -516,8 +516,7 @@ def Edit():
 			data = json.loads(ro.read())
 			cur = con.cursor()
 			
-			cur.execute("UPDATE posts (id,name,subject,author,description,img,comments) WHERE id =?
-			   VALUES (?,?,?,?,?,?)",(id,name,subject,user['id'],description, img, comments) )
+			cur.execute("UPDATE posts (id,name,subject,author,description,img,comments) WHERE id =? VALUES (?,?,?,?,?,?)",(id,name,subject,user['id'],description, img, comments) )
 			
 			con.commit()
 
