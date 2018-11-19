@@ -639,7 +639,7 @@ def Delete():
 						Ysearch = True
 						for fUser in data["users"]:
 							if fUser["username"] == follows:
-								fUser['followers']++
+								fUser['followers']+=1
 						
 				if search == False:
 					dUser["following"].append(Suser)
@@ -672,7 +672,7 @@ def Delete():
 						dUser['following'].pop(follows)
 						for fUser in data["users"]:
 							if fUser["username"] == follows:
-								fUser['followers']--
+								fUser['followers']-=1
 
 		with open(json_url, 'w') as f:
 			json.dump(data, f)		
