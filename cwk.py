@@ -228,9 +228,6 @@ def Following():
 			if user["username"] == session.get('CURRENT_USER')['username']:
 				for follows in user["following"]:
 					for post in data["posts"]:
-						if post["subject"] == follows:
-							results.append(post)
-							searched = True
 						if post["author"] == follows:
 							results.append(post)
 							searched = True
@@ -240,7 +237,7 @@ def Following():
 
 
 		if searched == False:
-			result = 'The page you requested does not exist. If you are having trouble finding things, try navigating using the alien head. If you think it should exist then add it using our new upload feature!'
+			result = 'You do not follow anyone!'
 
 		return render_template('template2.html', title = result, csssheet = url, image = image,user = session.get('CURRENT_USER'))
 
@@ -649,7 +646,7 @@ def Follow():
 
 		with open(json_url, 'w') as f:
 			json.dump(data, f)		
-		return redirect('/following/')				
+		return redirect('/user/?user='+Suser)				
 
 
 		
@@ -680,7 +677,7 @@ def Unfollow():
 
 		with open(json_url, 'w') as f:
 			json.dump(data, f)		
-		return redirect('/following/')			
+		return redirect('/user/?user='+Suser)		
 		
 		
 

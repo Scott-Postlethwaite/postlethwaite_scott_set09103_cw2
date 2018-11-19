@@ -15,14 +15,10 @@
 		<div>{{followers}} Followers</div>
 </div>    
 {% if Uname in user['following'] %}
-    {% mdebug(user['following']) %}
-	{% mdebug(Uname) %}
-		{% mdebug("Test1") %}
+
 	<div><a href='/unfollow/?unfollow={{Uname}}'>Unfollow</a></div>
 {% else %}
-    {% mdebug(user['following']) %}
-	{% mdebug(Uname) %}
-	{% mdebug("Test2") %}
+
 	<div><a href='/follow/?follow={{Uname}}'>Follow</a></div>
 {% endif %}
 	</div>
