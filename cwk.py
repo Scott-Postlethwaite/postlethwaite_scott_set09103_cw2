@@ -636,13 +636,14 @@ def Follow():
 			if dUser["username"] == session.get('CURRENT_USER')['username']:
 				for follows in dUser["following"]:
 					if follows == Suser:
-						Ysearch = True
-						for fUser in data["users"]:
-							if fUser["username"] == follows:
-								fUser['followers']+=1
+						search = True
+						
 						
 				if search == False:
 					dUser["following"].append(Suser)
+					for fUser in data["users"]:
+							if fUser["username"] == follows:
+								fUser['followers']+=1
 
 		with open(json_url, 'w') as f:
 			json.dump(data, f)		
