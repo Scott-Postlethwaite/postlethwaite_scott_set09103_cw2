@@ -444,7 +444,7 @@ def User():
 					results.append(post)
 			if searched == True:
 				results.sort()
-				return  render_template('profile.html', results = results, csssheet = url, image = image,user = session.get('CURRENT_USER'),Uname=name,bio=bio,profilePic=profilePic, followers=followers)
+				return  render_template('profile.html', results = results, csssheet = url, image = image,user = session.get('CURRENT_USER'),Uname=Suser,bio=bio,profilePic=profilePic, followers=followers)
 
 
 			if searched == False:
@@ -642,12 +642,12 @@ def Follow():
 				if search == False:
 					dUser["following"].append(Suser)
 					for fUser in data["users"]:
-							if fUser["username"] == follows:
+							if fUser["username"] == Suser:
 								fUser['followers']+=1
 
 		with open(json_url, 'w') as f:
 			json.dump(data, f)		
-		return redirect('/all/')				
+		return redirect('/following/')				
 
 
 		
@@ -677,7 +677,7 @@ def Unfollow():
 
 		with open(json_url, 'w') as f:
 			json.dump(data, f)		
-		return redirect('/all/')			
+		return redirect('/following/')			
 		
 		
 
