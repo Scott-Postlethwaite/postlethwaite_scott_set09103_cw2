@@ -670,7 +670,7 @@ def Unfollow():
 			if dUser["username"] == session.get('CURRENT_USER')['username']:
 				for follows in dUser["following"]:
 					if follows == Suser:
-						dUser["following"].pop(Suser)
+						dUser["following"].remove(Suser)
 						for fUser in data["users"]:
 							if fUser["username"] == follows:
 								fUser['followers']-=1
