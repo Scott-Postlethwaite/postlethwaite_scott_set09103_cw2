@@ -12,6 +12,7 @@
 	 <h1 class = "center">{{Uname}}</h1>
 	<div class = "center">
 		<div>{{bio}}</div>
+		<div>{{followers}} Followers</div>
 </div>    
 {% if Uname in user['following'] %}
 	<div><a href='/unfollow/?wunfollow={{Uname}}'>Unfollow</a></div>

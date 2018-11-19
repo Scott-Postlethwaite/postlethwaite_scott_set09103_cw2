@@ -126,7 +126,7 @@ def upload():
 				cur = con.cursor()
 				
 				cur.execute("INSERT INTO posts (id,name,subject,author,description,img,comments) 
-				   VALUES (?,?,?,?,?,?)",(id,name,subject,user['username'],description, img, comments) )
+				   VALUES (?,?,?,?,?,?)",(id,name,subject,user['id'],description, img, comments) )
 				
 				con.commit()
 
@@ -283,7 +283,7 @@ def All():
 	json_url = os.path.join(SITE_ROOT, "static", "everything.json")
 	url = url_for('static',filename='csstest.css')
 	image = url_for('static',filename='logo1.png')
-	results = query_db("SELECT * FROM contact")
+	results = query_db("SELECT * FROM posts")
 	return  render_template('template5.html', results = results, csssheet = url, image = image,user=session.get('CURRENT_USER'))
 
 
@@ -314,7 +314,7 @@ def register():
 			if pw == pw2:
 				with sql.connect("database.db") as con:
 					values=[user["username"],user["password"],user["bio"],user["Ppic"]]
-					change_db("INSERT INTO contact (username,password,bio,Ppic) VALUES (?,?,?,?)",values)
+					change_db("INSERT INTO posts (username,password,bio,Ppic) VALUES (?,?,?,?)",values)
 			else:
 				title = "Passwords don't match"
 				result = "I'm sorry, your passwords do not match. Please try again."
@@ -413,82 +413,45 @@ def User():
 	searched = False
 	results = []
 	Suser = request.args.get('user', '')
-	if request.method == 'POST':
-		if request.form['submit_button'] == 'Follow':
-			SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
-			json_url = os.path.join(SITE_ROOT, "static", "everything.json")
-			url = url_for('static',filename='csstest.css')
-			image = url_for('static',filename='logo1.png')
-			ro = open(json_url, "r")
-			data = json.loads(ro.read())
-			for dUser in data["users"]:
-				if dUser["username"] == session.get('CURRENT_USER')['username']:
-					for follows in dUser["following"]:
-						if follows == Suser:
-							Ysearch = True
-				if Ysearch == False:
-					dUser["following"].append(Suser)
-
-			with open(json_url, 'w') as f:
-				json.dump(data, f)
-			
-		if request.form['submit_button'] == 'Unfollow':
-			SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
-			json_url = os.path.join(SITE_ROOT, "static", "everything.json")
-			url = url_for('static',filename='csstest.css')
-			image = url_for('static',filename='logo1.png')
-			ro = open(json_url, "r")
-			data = json.loads(ro.read())
-			for dUser in data["users"]:
-				if dUser["username"] == session.get('CURRENT_USER')['username']:
-					for follows in dUser["following"]:
-						if follows == Suser:
-							dUser["following"].remove(user)
-
-			with open(json_url, 'w') as f:
-				json.dump(data, f)		
-		return redirect('/following/')
+	if Suser == '':
+		SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
+		json_url = os.path.join(SITE_ROOT, "static", "everything.json")
+		url = url_for('static',filename='csstest.css')
+		image = url_for('static',filename='logo1.png')
 	
+		ro = open(json_url, "r")
+		data = json.loads(ro.read())
+		entries = data["users"]
+		entries.sort()
+		title = "Search by user"
+		return render_template('template3.html', results = entries, title = title, csssheet = url, image = image,user = session.get('CURRENT_USER'))
 	else:
-		if Suser == '':
+	
 			SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
 			json_url = os.path.join(SITE_ROOT, "static", "everything.json")
 			url = url_for('static',filename='csstest.css')
 			image = url_for('static',filename='logo1.png')
-		
 			ro = open(json_url, "r")
 			data = json.loads(ro.read())
-			entries = data["users"]
-			entries.sort()
-			title = "Search by user"
-			return render_template('template3.html', results = entries, title = title, csssheet = url, image = image,user = session.get('CURRENT_USER'))
-		else:
-		
-				SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
-				json_url = os.path.join(SITE_ROOT, "static", "everything.json")
-				url = url_for('static',filename='csstest.css')
-				image = url_for('static',filename='logo1.png')
-				ro = open(json_url, "r")
-				data = json.loads(ro.read())
-				for Ruser in data["users"]:
-					if Ruser["username"] == Suser:
-						searched = True
-						profilePic = Ruser['Ppic']
-						name = Ruser['username']
-						bio = Ruser['bio']
-				for post in data["posts"]:
-					if post["author"] == Suser:
-						searched = True
-						results.append(post)
-				if searched == True:
-					results.sort()
-					return  render_template('profile.html', results = results, csssheet = url, image = image,user = session.get('CURRENT_USER'),Uname=name,bio=bio,profilePic=profilePic)
+			for Ruser in data["users"]:
+				if Ruser["username"] == Suser:
+					searched = True
+					profilePic = Ruser['Ppic']
+					name = Ruser['username']
+					bio = Ruser['bio']
+			for post in data["posts"]:
+				if post["author"] == Suser:
+					searched = True
+					results.append(post)
+			if searched == True:
+				results.sort()
+				return  render_template('profile.html', results = results, csssheet = url, image = image,user = session.get('CURRENT_USER'),Uname=name,bio=bio,profilePic=profilePic)
 
 
-				if searched == False:
-					result = 'The page you requested does not exist. If you are having trouble finding things, try navigating using the alien head. If you think it should exist, try adding it to our database using our new upload feature!'
+			if searched == False:
+				result = 'The page you requested does not exist. If you are having trouble finding things, try navigating using the alien head. If you think it should exist, try adding it to our database using our new upload feature!'
 
-				return render_template('template2.html', title = result, csssheet = url, image = image,user = session.get('CURRENT_USER'))
+			return render_template('template2.html', title = result, csssheet = url, image = image,user = session.get('CURRENT_USER'))
 
 
 				
@@ -546,8 +509,6 @@ def Edit():
 	else:
 		if request.method == 'POST':
 			search = False
-			SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
-			json_url = os.path.join(SITE_ROOT, "static", "everything.json")
 			url = url_for('static',filename='csstest.css')
 			image = url_for('static',filename='logo1.png')
 			ro = open(json_url, "r")
@@ -560,31 +521,13 @@ def Edit():
 				img = url_for('static',filename = fname)	
 			user = session.get('CURRENT_USER')
 			data = json.loads(ro.read())
-			for post in data["posts"]:
-				if int(post["id"]) == int(postID):
-					if user["username"] == post["author"]:
-						post['name'] = request.form['uplName']
-						post['subject'] = request.form['uplSubject']
-						post['description'] = request.form['uplDescription']
-						post['img'] = img
-						search = True
-			if search == True:
-				with open(json_url, 'w') as f:
-					json.dump(data, f)		
-				return redirect('/all/')
-			else:
-				url = url_for('static',filename='csstest.css')
-				image = url_for('static',filename='logo1.png')
-				SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
-				json_url = os.path.join(SITE_ROOT, "static", "everything.json")
+			cur = con.cursor()
+			
+			cur.execute("UPDATE posts (id,name,subject,author,description,img,comments) WHERE id =?
+			   VALUES (?,?,?,?,?,?)",(id,name,subject,user['id'],description, img, comments) )
+			
+			con.commit()
 
-				ro = open(json_url, "r")
-				data = json.loads(ro.read())
-				title = "Cannot Edit"
-				result = "You cannot edit this post."
-
-				return render_template('template2.html', title = title, result = result, csssheet = url, image = image,user=session.get('CURRENT_USER'))
-					
 
 		else:
 			SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
@@ -622,33 +565,11 @@ def Delete():
 		image = url_for('static',filename='logo1.png')
 		ro = open(json_url, "r")
 		user = session.get('CURRENT_USER')
-		data = json.loads(ro.read())
-		for post in data["posts"]:
-			if int(post["id"]) == int(postID):
-				if user["username"] == post["author"]:
-					change_db("DELETE FROM contact WHERE id = ?",[postID])
-					search = True
+		change_db("DELETE FROM posts WHERE id = ? AND author = ?",[postID, user['id']])
+		db.commit()
+		return redirect('/all/')								
 		
-		if search == True:
-			with open(json_url, 'w') as f:
-				json.dump(data, f)		
-			return redirect('/all/')								
-		else:
-			url = url_for('static',filename='csstest.css')
-			image = url_for('static',filename='logo1.png')
-			SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
-			json_url = os.path.join(SITE_ROOT, "static", "everything.json")
-
-			ro = open(json_url, "r")
-			data = json.loads(ro.read())
-			title = "Wrong user logged in"
-			result = "You cannot delete this post."
-
-			return render_template('template2.html', title = title, result = result, csssheet = url, image = image,user=session.get('CURRENT_USER'))
-					
-				
-
-
+		
 
 if __name__ == "__main__":
 
