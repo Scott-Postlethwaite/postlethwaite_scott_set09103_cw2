@@ -620,7 +620,7 @@ def Del():
 @app.route("/follow/")
 @app.route("/Follow/")
 def Follow():
-	postID = request.args.get('follow', '')			
+	Suser = request.args.get('follow', '')			
 	if not session.get('logged_in'):
 		return login()
 	else:
@@ -653,7 +653,7 @@ def Follow():
 @app.route("/unfollow/")
 @app.route("/Unfollow/")
 def Unfollow():
-	postID = request.args.get('unfollow', '')			
+	Suser = request.args.get('unfollow', '')			
 	if not session.get('logged_in'):
 		return login()
 	else:
