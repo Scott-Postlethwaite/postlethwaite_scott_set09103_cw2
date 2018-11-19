@@ -574,8 +574,8 @@ def Edit():
 				
 				
 @app.route("/delete/")
-@app.route("/delete/")
-def Delete():
+@app.route("/Delete/")
+def Del():
 	postID = request.args.get('delete', '')			
 	if not session.get('logged_in'):
 		return login()
