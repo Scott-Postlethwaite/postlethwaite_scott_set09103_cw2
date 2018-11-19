@@ -641,9 +641,11 @@ def Follow():
 						
 				if search == False:
 					dUser["following"].append(Suser)
+					session['CURRENT_USER'] = dUser
 					for fUser in data["users"]:
 							if fUser["username"] == Suser:
 								fUser['followers']+=1
+							
 
 		with open(json_url, 'w') as f:
 			json.dump(data, f)		
@@ -671,6 +673,7 @@ def Unfollow():
 				for follows in dUser["following"]:
 					if follows == Suser:
 						dUser["following"].remove(Suser)
+						session['CURRENT_USER'] = dUser
 						for fUser in data["users"]:
 							if fUser["username"] == follows:
 								fUser['followers']-=1
