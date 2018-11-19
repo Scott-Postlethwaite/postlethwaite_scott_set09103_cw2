@@ -125,8 +125,7 @@ def upload():
 			with sql.connect("database.db") as con:
 				cur = con.cursor()
 				
-				cur.execute("INSERT INTO posts (id,name,subject,author,description,img,comments) 
-				   VALUES (?,?,?,?,?,?)",(id,name,subject,user['id'],description, img, comments) )
+				cur.execute("INSERT INTO posts (id,name,subject,author,description,img,comments) VALUES (?,?,?,?,?,?)",(id,name,subject,user['id'],description, img, comments) )
 				
 				con.commit()
 
@@ -482,8 +481,7 @@ def Comment():
 			user = session.get('CURRENT_USER')
 			with sql.connect("database.db") as con:
 				cur = con.cursor()
-				cur.execute("INSERT INTO comments (description,author,postId) 
-				VALUES (?,?,?)",(description,user['username'],postID) )
+				cur.execute("INSERT INTO comments (description,author,postId) VALUES (?,?,?)",(description,user['username'],postID) )
             
             con.commit()		
 			return redirect('/all/')
