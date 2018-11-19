@@ -96,7 +96,7 @@ def home():
 
 		url = url_for('static',filename='csstest.css')
 		image = url_for('static',filename='logo1.png')
-		results = query_db("SELECT * FROM contact")
+		results = query_db("SELECT * FROM posts")
 		return render_template('templateex.html', csssheet = url, image = image,user = session.get('CURRENT_USER'),results=results)
 
 #this allows the user to report their own sighting. They also have the option of adding an image.
@@ -121,13 +121,8 @@ def upload():
 			subject = request.form['uplSubject']
 			description = request.form['uplDescription']
 			user = session.get('CURRENT_USER')
-			id = len(data['posts'])
-			with sql.connect("database.db") as con:
-				cur = con.cursor()
-				
-				cur.execute("INSERT INTO posts (id,name,subject,author,description,img,comments) VALUES (?,?,?,?,?,?)",(id,name,subject,user['id'],description, img, comments) )
-				
-				con.commit()
+			values=[name,subject,description,user]
+			change_db("INSERT INTO posts (name,subject,description,user) VALUES (?,?,?,?)",values)
 
 
 			return redirect("/all/")
@@ -312,7 +307,7 @@ def register():
 		if username != '' and pw != '':
 			if pw == pw2:
 				with sql.connect("database.db") as con:
-					values=[user["username"],user["password"],user["bio"],user["Ppic"]]
+					values=[username,password,bio,ppic]
 					change_db("INSERT INTO posts (username,password,bio,Ppic) VALUES (?,?,?,?)",values)
 			else:
 				title = "Passwords don't match"
