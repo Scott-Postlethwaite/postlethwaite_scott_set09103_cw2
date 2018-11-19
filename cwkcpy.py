@@ -8,7 +8,7 @@ from functools import wraps
 app = Flask(__name__)
 
 DATABASE = 'database.db'
-
+databaseForLogin = sqlite3.connect('database.db')
 
 
 SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
@@ -151,18 +151,15 @@ def login():
 			pwd = pw.encode('utf-8')
 			url = url_for('static',filename='csstest.css')
 			image = url_for('static',filename='logo1.png')
-			conn.row_factory = sqlite3.Row
-			c = conn.cursor()
-			c.execute('select * from users')
-			data = c.fetchall()
+			data=query_db("SELECT * FROM users WHERE username=?",[username])
 			for user in data:
-					username1 = user["username"]
-					pwd1 = user["password"]
-					password1 = pwd1.encode('utf-8')
-					if(password1 == bcrypt.hashpw(pwd, password1) and username1 == username):
-						session['logged_in'] = True
-						session['CURRENT_USER'] = user
-						return redirect("/home/")
+				username1 = user[1]
+				pwd1 = user[2]
+				password1 = pwd1.encode('utf-8')
+				if(password1 == bcrypt.hashpw(pwd, password1) and username1 == username):
+					session['logged_in'] = True
+					session['CURRENT_USER'] = user
+					return redirect("/home/")
 
 			if  loggedIn == False:
 				title = "Incorrect details"
@@ -309,7 +306,7 @@ def register():
 			if pw == pw2:
 				values=[username,password,bio,ppic]
 				change_db("INSERT INTO users (username,password,bio,Ppic) VALUES (?,?,?,?)",values)
-				return 
+				return redirect("/home/")
 			else:
 				title = "Passwords don't match"
 				result = "I'm sorry, your passwords do not match. Please try again."
