@@ -444,7 +444,7 @@ def User():
 					results.append(post)
 			if searched == True:
 				results.sort()
-				return  render_template('profile.html', results = results, csssheet = url, image = image,user = session.get('CURRENT_USER'),Uname=name,bio=bio,profilePic=profilePic)
+				return  render_template('profile.html', results = results, csssheet = url, image = image,user = session.get('CURRENT_USER'),Uname=name,bio=bio,profilePic=profilePic, followers=followers)
 
 
 			if searched == False:
@@ -669,7 +669,7 @@ def Unfollow():
 			if dUser["username"] == session.get('CURRENT_USER')['username']:
 				for follows in dUser["following"]:
 					if follows == Suser:
-						dUser['following'].pop(follows)
+						dUser["following"].pop(Suser)
 						for fUser in data["users"]:
 							if fUser["username"] == follows:
 								fUser['followers']-=1

@@ -15,7 +15,7 @@
 		<div>{{followers}} Followers</div>
 </div>    
 {% if Uname in user['following'] %}
-	<div><a href='/unfollow/?wunfollow={{Uname}}'>Unfollow</a></div>
+	<div><a href='/unfollow/?unfollow={{Uname}}'>Unfollow</a></div>
 {% else %}
 	<div><a href='/follow/?follow={{Uname}}'>Follow</a></div>
 {% endif %}
