@@ -320,7 +320,7 @@ def register():
 
 			title = "Missing fields"
 			result = "Either the username or password is blank. Please try again."
-            return render_template('template2.html', title = title, result = result, csssheet = url, image = image)
+			return render_template('template2.html', title = title, result = result, csssheet = url, image = image)
 
 
 	else:
@@ -435,7 +435,7 @@ def User():
 					profilePic = Ruser['Ppic']
 					name = Ruser['username']
 					bio1 = Ruser['bio']
-					bio = bio.replace('\n', '<br>')
+					bio = bio1.replace('\n', '<br>')
 					followers = Ruser['followers']
 			for post in data["posts"]:
 				if post["author"] == Suser:
