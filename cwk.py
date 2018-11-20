@@ -96,9 +96,10 @@ def upload():
 				name = request.form['uplName']
 				subject = request.form['uplSubject']
 				description = request.form['uplDescription']
+				description1 = description.replace('\n', '<br>')
 				user = session.get('CURRENT_USER')
 				id = len(data['posts'])
-				post = {'id':id, 'name':name, 'subject':subject, 'author':user['username'], 'description':description, 'img':img, 'comments':[]}
+				post = {'id':id, 'name':name, 'subject':subject, 'author':user['username'], 'description':description1, 'img':img, 'comments':[]}
 				data["posts"].append(post)
 				for dSubject in data["subjects"]:
 					if dSubject == subject:
@@ -303,7 +304,7 @@ def register():
 						data["users"].append(user)
 						with open(json_url, 'w') as f:
 							json.dump(data, f)
-						return redirect("/home/")
+						return redirect("/login/")
 
 					if  Ysearch == True:
 						title = "Username already in use"
@@ -317,9 +318,9 @@ def register():
 
 		else:
 
-                        title = "Missing fields"
+			title = "Missing fields"
 			result = "Either the username or password is blank. Please try again."
-                        return render_template('template2.html', title = title, result = result, csssheet = url, image = image)
+            return render_template('template2.html', title = title, result = result, csssheet = url, image = image)
 
 
 	else:
@@ -433,7 +434,8 @@ def User():
 					searched = True
 					profilePic = Ruser['Ppic']
 					name = Ruser['username']
-					bio = Ruser['bio']
+					bio1 = Ruser['bio']
+					bio = bio.replace('\n', '<br>')
 					followers = Ruser['followers']
 			for post in data["posts"]:
 				if post["author"] == Suser:
@@ -477,8 +479,9 @@ def Comment():
 			image = url_for('static',filename='logo1.png')
 			ro = open(json_url, "r")
 			description = request.form['uplDescription']
+			description1 = description.replace('\n', '<br>')
 			user = session.get('CURRENT_USER')
-			comment = {'author':user['username'], 'description':description}
+			comment = {'author':user['username'], 'description':description1}
 			data = json.loads(ro.read())
 			for post in data["posts"]:
 				if int(post["id"]) == int(postID):
@@ -527,7 +530,9 @@ def Edit():
 					if user["username"] == post["author"]:
 						post['name'] = request.form['uplName']
 						post['subject'] = request.form['uplSubject']
-						post['description'] = request.form['uplDescription']
+						description = request.form['uplDescription']
+						description1 = description.replace('\n', '<br>')
+						post['description'] = description1
 						post['img'] = img
 						search = True
 			if search == True:

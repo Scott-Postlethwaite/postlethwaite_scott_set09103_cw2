@@ -11,7 +11,9 @@
 {% endif %}
 	 <h1 class = "center">{{Uname}}</h1>
 	<div class = "center">
+	{% autoescape false %}
 		<div>{{bio}}</div>
+		{% endautoescape %}
 		<div>{{followers}} Followers</div>
 </div>    
 {% if Uname in user['following'] %}
@@ -35,13 +37,18 @@
 		{% endif %}
 		<div>Subject: <a href='/subject/?subject={{result["subject"]}}'>{{result["subject"]}}</a></div>
 		<div><a href='/user/?user={{result["author"]}}'>{{result["author"]}}</a></div>
+		{% autoescape false %}
 		<div>{{result["description"]}}</div>
+		{% endautoescape %}
 		</div>
 		<div class = "posts">
 				{% for comment in result['comments'] %}
 			<div class = "posts">	
-			<div><a href='/user/?user={{result["author"]}}'>{{comment["author"]}}</a></div>
+			<div><a href='/user/?user={{comment["author"]}}'>{{comment["author"]}}</a></div>
+			{% autoescape false %}
 			<div>{{comment["description"]}}</div>
+			{% endautoescape %}
+
 			</div>
 		{% endfor %}
 		{% if session.logged_in  %}

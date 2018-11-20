@@ -397,9 +397,8 @@ def Help():
 		
 		
 		
-		
-@app.route("/user/",methods=['POST','GET'])
-@app.route("/User/",methods=['POST','GET'])
+@app.route("/user/")
+@app.route("/User/")
 def User():
 	Ysearch = False
 	searched = False
@@ -431,23 +430,21 @@ def User():
 					profilePic = Ruser['Ppic']
 					name = Ruser['username']
 					bio = Ruser['bio']
+					followers = Ruser['followers']
 			for post in data["posts"]:
 				if post["author"] == Suser:
 					searched = True
 					results.append(post)
 			if searched == True:
 				results.sort()
-				return  render_template('profile.html', results = results, csssheet = url, image = image,user = session.get('CURRENT_USER'),Uname=name,bio=bio,profilePic=profilePic)
+				return  render_template('profile.html', results = results, csssheet = url, image = image,user = session.get('CURRENT_USER'),Uname=Suser,bio=bio,profilePic=profilePic, followers=followers)
 
 
 			if searched == False:
 				result = 'The page you requested does not exist. If you are having trouble finding things, try navigating using the alien head. If you think it should exist, try adding it to our database using our new upload feature!'
 
 			return render_template('template2.html', title = result, csssheet = url, image = image,user = session.get('CURRENT_USER'))
-
-
-				
-				
+	
 				
 				
 				
@@ -558,6 +555,74 @@ def Delete():
 		db.commit()
 		return redirect('/all/')								
 		
+		
+		
+		
+				
+@app.route("/follow/")
+@app.route("/Follow/")
+def Follow():
+	Suser = request.args.get('follow', '')			
+	if not session.get('logged_in'):
+		return login()
+	else:
+		search = False
+		SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
+		json_url = os.path.join(SITE_ROOT, "static", "everything.json")
+		url = url_for('static',filename='csstest.css')
+		image = url_for('static',filename='logo1.png')
+		ro = open(json_url, "r")
+		user = session.get('CURRENT_USER')
+		data = json.loads(ro.read())
+		for dUser in data["users"]:
+			if dUser["username"] == session.get('CURRENT_USER')['username']:
+				for follows in dUser["following"]:
+					if follows == Suser:
+						search = True
+						
+						
+				if search == False:
+					dUser["following"].append(Suser)
+					session['CURRENT_USER'] = dUser
+					for fUser in data["users"]:
+							if fUser["username"] == Suser:
+								fUser['followers']+=1
+							
+
+		with open(json_url, 'w') as f:
+			json.dump(data, f)		
+		return redirect('/user/?user='+Suser)				
+
+
+		
+@app.route("/unfollow/")
+@app.route("/Unfollow/")
+def Unfollow():
+	Suser = request.args.get('unfollow', '')			
+	if not session.get('logged_in'):
+		return login()
+	else:
+		search = False
+		SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
+		json_url = os.path.join(SITE_ROOT, "static", "everything.json")
+		url = url_for('static',filename='csstest.css')
+		image = url_for('static',filename='logo1.png')
+		ro = open(json_url, "r")
+		user = session.get('CURRENT_USER')
+		data = json.loads(ro.read())
+		for dUser in data["users"]:
+			if dUser["username"] == session.get('CURRENT_USER')['username']:
+				for follows in dUser["following"]:
+					if follows == Suser:
+						dUser["following"].remove(Suser)
+						session['CURRENT_USER'] = dUser
+						for fUser in data["users"]:
+							if fUser["username"] == follows:
+								fUser['followers']-=1
+
+		with open(json_url, 'w') as f:
+			json.dump(data, f)		
+		return redirect('/user/?user='+Suser)		
 		
 
 if __name__ == "__main__":
