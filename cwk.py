@@ -184,7 +184,10 @@ def Subject():
 	
 		ro = open(json_url, "r")
 		data = json.loads(ro.read())
-		entries = data["subjects"]
+		entries = []
+		for post in data["posts"]:
+				if post["subject"] not in entries:
+					entries.append(post["subject"])
 		entries.sort()
 		title = "Search by subject"
 		return render_template('template3.html', results = entries, title = title, csssheet = url, image = image,user = session.get('CURRENT_USER'))
@@ -410,17 +413,18 @@ def User():
 	results = []
 	Suser = request.args.get('user', '')
 	if Suser == '':
-		SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
-		json_url = os.path.join(SITE_ROOT, "static", "everything.json")
-		url = url_for('static',filename='csstest.css')
-		image = url_for('static',filename='logo1.png')
-	
-		ro = open(json_url, "r")
-		data = json.loads(ro.read())
-		entries = data["users"]
-		entries.sort()
-		title = "Search by user"
-		return render_template('template3.html', results = entries, title = title, csssheet = url, image = image,user = session.get('CURRENT_USER'))
+	    url = url_for('static',filename='csstest.css')
+        image = url_for('static',filename='logo1.png')
+        SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
+        json_url = os.path.join(SITE_ROOT, "static", "everything.json")
+
+        ro = open(json_url, "r")
+        data = json.loads(ro.read())
+        title = "No User Found"
+        result = "The user searched for could not be found. Try clicking their name when you see one of their posts!"
+
+        return render_template('template2.html', title = title, result = result, csssheet = url, image = image,user=session.get('CURRENT_USER'))
+
 	else:
 	
 			SITE_ROOT = os.path.realpath(os.path.dirname(__file__))

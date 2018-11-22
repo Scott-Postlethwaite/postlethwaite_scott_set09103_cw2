@@ -1,0 +1,77 @@
+<!doctype html>
+
+<body>
+<div>
+
+	<div class = "center">
+	<div id ="notBody">
+	{% for result in results %}		
+		<div id="notBody">
+		<div class = "posts">
+		 <h1 class = "center">{{result["name"]}}</h1>
+		{% if result["img"] != '' %}
+			<div><img src="{{result["img"]}}"style="width:380px;height:240px;"/></div>
+		{% endif %}
+		<div>Subject: <a href='/subject/?subject={{result["subject"]}}'>{{result["subject"]}}</a></div>
+		<div><a href='/user/?user={{result["author"]}}'>{{result["author"]}}</a></div>
+		{% autoescape false %}
+		<div>{{result["description"]}}</div>
+		{% endautoescape %}
+		</div>
+		<div class = "posts">
+				{% for comment in comments %}
+				{% if result["id"] == comment["postId"]  %}
+			<div class = "posts">	
+			<div><a href='/user/?user={{comment[1]}}'>{{comment[1]}}</a></div>
+			{% autoescape false %}
+			<div>{{comment["description"]}}</div>
+			{% endautoescape %}
+			</div>
+			{% endif %}
+		{% endfor %}
+		{% if session.logged_in  %}
+			<div><a href='/comment/?comment={{result[0]}}'>Comment</a></div>
+		{% endif %}
+		{% if user == result["author"]  %}
+			<div><a href='/edit/?edit={{result[0]}}'>Edit</a>   <a href='/delete/?delete={{result[0]}}'>Delete</a></div>
+		{% endif %}
+		</div>
+		</div>
+	{% endfor %}
+</div>    
+</div>
+</div>
+</div>
+	</body>
+	<div id="dropdown">
+		{% if not session.logged_in  %}
+			<div id="logo"><img src="{{image}}"style="width:120px;height:120px;"/></div>
+                        {% else %}
+                                 	{% if user["Ppic"] != '' %}
+			<div><img src="{{user["Ppic"]}}"style="width:150px;height:150px; border-radius:50%;"/></div>
+		{% else %}
+			<div id="logo"><img src="{{image}}"style="width:120px;height:120px;"/></div>
+		{% endif %}
+                {% endif %}
+
+	<div id="hiddenMenu">
+	<ul>
+<li id="write"><h3><a href="/home">Home</a></h3> </li>
+		<li id="delete"><h3><a href="/subject">Subjects</a></h3> </li>
+		<li id="edit2"><h3><a href="/following">Following</a></h3> </li>
+		 <li id="edit2"><h3><a href="/all">All</a></h3> </li>
+		 <li id="edit2"><h3><a href="/upload">Post</a></h3> </li>
+		{% if not session.logged_in  %}
+			 <li id="edit2"><h3><a href="/login">Login</a></h3> </li>
+			 <li id="edit2"><h3><a href="/register">Register</a></h3> </li>
+			{% else %}
+				 <li id="edit2"><h3><a href="/logout">Log Out</a></h3> </li>
+		{% endif %}
+
+	</ul>
+	</div>
+	</div>
+</html> 
+	<link rel = "stylesheet" type="text/css" href="{{csssheet}}" >
+
+</html>

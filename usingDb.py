@@ -123,7 +123,7 @@ def upload():
 			description = request.form['uplDescription']
 			user = session.get('CURRENT_USER')
 			values=[name,subject,description,user]
-			change_db("INSERT INTO posts (name,subject,description,user) VALUES (?,?,?,?)",values)
+			change_db("INSERT INTO posts (title,subject,description,author) VALUES (?,?,?,?)",values)
 
 
 			return redirect("/all/")
@@ -158,7 +158,7 @@ def login():
 				password1 = pwd1.encode('utf-8')
 				if(password1 == bcrypt.hashpw(pwd, password1) and username1 == username):
 					session['logged_in'] = True
-					session['CURRENT_USER'] = user
+					session['CURRENT_USER'] = user[1]
 					return redirect("/home/")
 
 			if  loggedIn == False:
@@ -422,22 +422,15 @@ def User():
 			json_url = os.path.join(SITE_ROOT, "static", "everything.json")
 			url = url_for('static',filename='csstest.css')
 			image = url_for('static',filename='logo1.png')
-			ro = open(json_url, "r")
-			data = json.loads(ro.read())
-			for Ruser in data["users"]:
-				if Ruser["username"] == Suser:
-					searched = True
-					profilePic = Ruser['Ppic']
-					name = Ruser['username']
-					bio = Ruser['bio']
-					followers = Ruser['followers']
-			for post in data["posts"]:
-				if post["author"] == Suser:
-					searched = True
-					results.append(post)
-			if searched == True:
-				results.sort()
-				return  render_template('profile.html', results = results, csssheet = url, image = image,user = session.get('CURRENT_USER'),Uname=Suser,bio=bio,profilePic=profilePic, followers=followers)
+			data=query_db("SELECT * FROM users WHERE username=?",[Suser])
+			for user in data:
+					profilePic = Ruser[4]
+					name = Ruser[1]
+					bio = Ruser[3]
+					followers = Ruser[5]
+			results=query_db("SELECT * FROM posts WHERE author=?",[Suser])
+			results.sort()
+			return  render_template('profile.html', results = results, csssheet = url, image = image,user = session.get('CURRENT_USER'),Uname=Suser,bio=bio,profilePic=profilePic, followers=followers)
 
 
 			if searched == False:
@@ -466,13 +459,10 @@ def Comment():
 		if request.method == 'POST':
 			url = url_for('static',filename='csstest.css')
 			image = url_for('static',filename='logo1.png')
-			ro = open(json_url, "r")
 			description = request.form['uplDescription']
 			user = session.get('CURRENT_USER')
-			with sql.connect("database.db") as con:
-				cur = con.cursor()
-				cur.execute("INSERT INTO comments (description,author,postId) VALUES (?,?,?)",(description,user['username'],postID) )
-				con.commit()		
+			values=[description,user,postID]
+			change_db("INSERT INTO comments (description,author,postId) VALUES (?,?,?)",values)	
 			return redirect('/all/')
 
 		else:
@@ -507,7 +497,7 @@ def Edit():
 				f.save(os.path.join(app.config['static'], fname))	
 				img = url_for('static',filename = fname)	
 			user = session.get('CURRENT_USER')
-			data = json.loads(ro.read())
+
 			cur = con.cursor()
 			
 			cur.execute("UPDATE posts (id,name,subject,author,description,img,comments) WHERE id =? VALUES (?,?,?,?,?,?)",(id,name,subject,user['id'],description, img, comments) )
@@ -549,7 +539,6 @@ def Delete():
 		json_url = os.path.join(SITE_ROOT, "static", "everything.json")
 		url = url_for('static',filename='csstest.css')
 		image = url_for('static',filename='logo1.png')
-		ro = open(json_url, "r")
 		user = session.get('CURRENT_USER')
 		change_db("DELETE FROM posts WHERE id = ? AND author = ?",[postID, user['id']])
 		db.commit()
@@ -583,7 +572,7 @@ def Follow():
 						
 				if search == False:
 					dUser["following"].append(Suser)
-					session['CURRENT_USER'] = dUser
+					session['CURRENT_USER'] =dUser[1]
 					for fUser in data["users"]:
 							if fUser["username"] == Suser:
 								fUser['followers']+=1
@@ -615,7 +604,7 @@ def Unfollow():
 				for follows in dUser["following"]:
 					if follows == Suser:
 						dUser["following"].remove(Suser)
-						session['CURRENT_USER'] = dUser
+						session['CURRENT_USER'] = dUser[1]
 						for fUser in data["users"]:
 							if fUser["username"] == follows:
 								fUser['followers']-=1
