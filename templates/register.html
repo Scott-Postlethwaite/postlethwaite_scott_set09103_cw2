@@ -23,13 +23,21 @@
 <form action="" name="form"  method="POST" enctype="multipart/form-data">
 {% if type == 'register' %}
 <p class="center">Username:<input type="text" name="username" placeholder="Username"></textarea><br /></p>
-{% if type == 'register' or type == 'password' %}
 <p class="center">Password:<input type="password" name="password" placeholder="Password"></textarea><br /></p>
 <p class="center">Confirm Password:<input type="password" name="password2" placeholder="Password"></textarea><br /></p>
-{% elif type == 'register' or type == 'bio' %}
+<p class="center">Bio:</p>
+ <textarea name="uplBio" rows="15" cols="100" class="center"></textarea><br />
+ <p class='center'>Profile Pic:<input type="file" class="center"  name="datafile"/></p>
+{% elif type == 'password' %}
+ <p class="center">Password:<input type="password" name="password" placeholder="Password"></textarea><br /></p>
+<p class="center">Confirm Password:<input type="password" name="password2" placeholder="Password"></textarea><br /></p>
+{% elif type == 'bio' %}
 <p class="center">Bio:</p>
  <textarea name="uplBio" rows="15" cols="100" class="center">{% if type == 'edit' %}{{result['bio']}}{% endif %}</textarea><br />
  <p class='center'>Profile Pic:<input type="file" class="center"  name="datafile"/></p>
+ {% endif %}
+ 
+ 
  {% endif %}
 <p class="center"> <input type="submit" name="submit" id="submit"/></p>
 </form>

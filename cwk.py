@@ -274,7 +274,7 @@ def register():
 	
 	url = url_for('static',filename='csstest.css')
 	image = url_for('static',filename='logo1.png')
-	tye = 'register'
+	type = 'register'
 
 	if request.method == 'POST':
 		Ysearch = False
