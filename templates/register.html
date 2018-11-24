@@ -7,7 +7,13 @@
 		<div id="notBody">
 <div class = "posts">
 <p class = "center">
-	 <h1 class = "center">Create an account</h1>    
+	 {% if type == 'register' %}
+	 <h1 class = "center">Create an account</h1>
+{% elif type == 'password' %}	 
+	 <h1 class = "center">Change your password</h1>
+{% elif type == 'bio' %}	 
+	 <h1 class = "center">Update your bio</h1>
+{% endif %} 
  </p>
 
 
@@ -15,12 +21,16 @@
 
 
 <form action="" name="form"  method="POST" enctype="multipart/form-data">
+{% if type == 'register' %}
 <p class="center">Username:<input type="text" name="username" placeholder="Username"></textarea><br /></p>
+{% if type == 'register' or type == 'password' %}
 <p class="center">Password:<input type="password" name="password" placeholder="Password"></textarea><br /></p>
 <p class="center">Confirm Password:<input type="password" name="password2" placeholder="Password"></textarea><br /></p>
-<p class='center'>Profile Pic:<input type="file" class="center"  name="datafile"/></p>
+{% elif type == 'register' or type == 'bio' %}
 <p class="center">Bio:</p>
- <textarea name="uplBio" rows="15" cols="100" class="center"></textarea><br />
+ <textarea name="uplBio" rows="15" cols="100" class="center">{% if type == 'edit' %}{{result['bio']}}{% endif %}</textarea><br />
+ <p class='center'>Profile Pic:<input type="file" class="center"  name="datafile"/></p>
+ {% endif %}
 <p class="center"> <input type="submit" name="submit" id="submit"/></p>
 </form>
 </div>
@@ -39,6 +49,7 @@
                          <li id="edit2"><h3><a href="/login">Login</a></h3> </li>
                          <li id="edit2"><h3><a href="/register">Register</a></h3> </li>
                         {% else %}
+								 <li id = "edit2"><h3><a href='/user/?user={{user["username"]}}'>My Profile</a></h3></li>
                                  <li id="edit2"><h3><a href="/logout">Log Out</a></h3> </li>
                 {% endif %}
 

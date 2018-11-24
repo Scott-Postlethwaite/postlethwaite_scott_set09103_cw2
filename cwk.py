@@ -99,14 +99,11 @@ def upload():
 				description1 = description.replace('\n', '<br>')
 				user = session.get('CURRENT_USER')
 				id = len(data['posts'])
+				for post in data["posts"]:
+					if post["id"] == id:
+						id+=1
 				post = {'id':id, 'name':name, 'subject':subject, 'author':user['username'], 'description':description1, 'img':img, 'comments':[]}
 				data["posts"].append(post)
-				for dSubject in data["subjects"]:
-					if dSubject == subject:
-						Ysearch = True
-				if Ysearch == False:
-					data["subjects"].append(subject)
-
 
 			with open(json_url, 'w') as f:
 				json.dump(data, f)
@@ -277,6 +274,7 @@ def register():
 	
 	url = url_for('static',filename='csstest.css')
 	image = url_for('static',filename='logo1.png')
+	tye = 'register'
 
 	if request.method == 'POST':
 		Ysearch = False
@@ -327,7 +325,7 @@ def register():
 
 
 	else:
-		return render_template('register.html', csssheet = url, image = image)
+		return render_template('register.html', csssheet = url, image = image,type=type)
 
 
 
@@ -451,24 +449,13 @@ def User():
 
 
 			if searched == False:
-				result = 'The page you requested does not exist. If you are having trouble finding things, try navigating using the alien head. If you think it should exist, try adding it to our database using our new upload feature!'
+				result = 'The user searched for could not be found. Try clicking their name when you see one of their posts!'
 
 			return render_template('template2.html', title = result, csssheet = url, image = image,user = session.get('CURRENT_USER'))
 
 
 				
-				
-				
-				
-				
-				
-				
-	
-				
-				
-				
-				
-				
+
 @app.route("/comment/",methods=['POST','GET'])
 @app.route("/Comment/",methods=['POST','GET'])
 def Comment():
@@ -519,19 +506,19 @@ def Edit():
 			json_url = os.path.join(SITE_ROOT, "static", "everything.json")
 			url = url_for('static',filename='csstest.css')
 			image = url_for('static',filename='logo1.png')
-			ro = open(json_url, "r")
-			if 'datafile' not in request.files:
-				img = ''
-			else:
-				f = request.files['datafile']
-				fname = f.filename
-				f.save(os.path.join(app.config['static'], fname))	
-				img = url_for('static',filename = fname)	
+			ro = open(json_url, "r")	
 			user = session.get('CURRENT_USER')
 			data = json.loads(ro.read())
 			for post in data["posts"]:
 				if int(post["id"]) == int(postID):
 					if user["username"] == post["author"]:
+						if 'datafile' not in request.files:
+							img = post['img']
+						else:
+							f = request.files['datafile']
+							fname = f.filename
+							f.save(os.path.join(app.config['static'], fname))	
+							img = url_for('static',filename = fname)
 						post['name'] = request.form['uplName']
 						post['subject'] = request.form['uplSubject']
 						description = request.form['uplDescription']
@@ -576,6 +563,132 @@ def Edit():
 			
 				
 				
+				
+				
+				
+				
+				
+@app.route("/update/",methods=['POST','GET'])
+@app.route("/Update/",methods=['POST','GET'])
+def Updatebio():
+	name = request.args.get('update', '')	
+	if not session.get('logged_in'):
+		return login()
+	else:
+		if request.method == 'POST':
+			if session.get('CURRENT_USER')["username"] == name:
+				search = False
+				SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
+				json_url = os.path.join(SITE_ROOT, "static", "everything.json")
+				url = url_for('static',filename='csstest.css')
+				image = url_for('static',filename='logo1.png')
+				ro = open(json_url, "r")
+				json_url = os.path.join(SITE_ROOT, "static", "everything.json")
+				bio = request.form['uplBio']
+				with open(json_url) as f:
+					data = json.load(f)
+					for user1 in data["users"]:
+						if user1["username"] == name:
+							if 'datafile' not in request.files:
+								ppic = user1['Ppic']
+							else:
+								f = request.files['datafile']
+								fname = f.filename
+								f.save(os.path.join(app.config['static'], fname))	
+								ppic = url_for('static',filename = fname)
+							bio1 = bio.replace('\n', '<br>')
+							user1['bio'] = bio1
+							user1['Ppic'] = ppic
+							search = True
+					if search == True:
+						with open(json_url, 'w') as f:
+							json.dump(data, f)		
+						return redirect('/user/?user='+name)
+			else:
+
+				title = "You cannot edit this user"
+				result = "This user cannot be edited."
+				return render_template('template2.html', title = title, result = result, csssheet = url, image = image)
+
+
+		else:
+			SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
+			json_url = os.path.join(SITE_ROOT, "static", "everything.json")
+			url = url_for('static',filename='csstest.css')
+			image = url_for('static',filename='logo1.png')
+			ro = open(json_url, "r")
+			type = 'bio'
+			data = json.loads(ro.read())
+			result=''
+			for user in data["users"]:
+				if user["username"] == name:
+					result = user
+				
+
+			return render_template('register.html',type=type, csssheet = url, image = image,user = session.get('CURRENT_USER'), result=result)
+
+			
+				
+				
+				
+				
+				
+
+				
+				
+@app.route("/changepw/",methods=['POST','GET'])
+@app.route("/changepassword/",methods=['POST','GET'])
+def Changepw():
+	name = request.args.get('update', '')			
+	if not session.get('logged_in'):
+		return login()
+	else:
+		if request.method == 'POST':
+			if session.get('CURRENT_USER')["username"] == name:
+				search = False
+				SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
+				json_url = os.path.join(SITE_ROOT, "static", "everything.json")
+				url = url_for('static',filename='csstest.css')
+				image = url_for('static',filename='logo1.png')
+				ro = open(json_url, "r")
+				Ysearch = False
+				json_url = os.path.join(SITE_ROOT, "static", "everything.json")
+				pw = request.form['password']
+				pwd = pw.encode('utf-8')
+				password = bcrypt.hashpw(pwd, bcrypt.gensalt())
+				pw2 = request.form['password2']
+				if pw == pw2:
+					with open(json_url) as f:
+						data = json.load(f)
+						for user1 in data["users"]:
+							if user1["username"] == name:
+								user1['password'] = password
+								search = True
+						if search == True:
+							with open(json_url, 'w') as f:
+								json.dump(data, f)		
+							return redirect('/user/?user='+name)
+				else:
+					title = "Passwords don't match"
+					result = "I'm sorry, your passwords do not match. Please try again."
+					return render_template('template2.html', title = title, result = result, csssheet = url, image = image)
+
+			else:
+
+				title = "You cannot change this password"
+				result = "This user cannot be edited."
+				return render_template('template2.html', title = title, result = result, csssheet = url, image = image)
+
+
+		else:
+			SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
+			json_url = os.path.join(SITE_ROOT, "static", "everything.json")
+			url = url_for('static',filename='csstest.css')
+			image = url_for('static',filename='logo1.png')
+			ro = open(json_url, "r")
+			type = 'password'
+
+			return render_template('register.html',type=type, csssheet = url, image = image,user = session.get('CURRENT_USER'))
 				
 				
 				

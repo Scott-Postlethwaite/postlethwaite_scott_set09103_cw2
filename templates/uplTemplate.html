@@ -69,6 +69,7 @@
                          <li id="edit2"><h3><a href="/login">Login</a></h3> </li>
                          <li id="edit2"><h3><a href="/register">Register</a></h3> </li>
                         {% else %}
+								 <li id = "edit2"><h3><a href='/user/?user={{user["username"]}}'>My Profile</a></h3></li>
                                  <li id="edit2"><h3><a href="/logout">Log Out</a></h3> </li>
                 {% endif %}
 

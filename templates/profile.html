@@ -14,6 +14,9 @@
 	{% autoescape false %}
 		<div>{{bio}}</div>
 		{% endautoescape %}
+			{% if user['username'] == Uname  %}
+			<div><a href='/update/?update={{Uname}}'>Update Profile</a>   <a href='/changepw/?update={{Uname}}'>Change Password</a></div>
+		{% endif %}
 		<div>{{followers}} Followers</div>
 </div>    
 {% if Uname in user['following'] %}
@@ -84,6 +87,7 @@
                          <li id="edit2"><h3><a href="/login">Login</a></h3> </li>
                          <li id="edit2"><h3><a href="/register">Register</a></h3> </li>
                         {% else %}
+								 <li id = "edit2"><h3><a href='/user/?user={{user["username"]}}'>My Profile</a></h3></li>
                                  <li id="edit2"><h3><a href="/logout">Log Out</a></h3> </li>
                 {% endif %}
 
