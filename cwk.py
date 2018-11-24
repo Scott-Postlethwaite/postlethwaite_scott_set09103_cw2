@@ -411,17 +411,17 @@ def User():
 	results = []
 	Suser = request.args.get('user', '')
 	if Suser == '':
-	    url = url_for('static',filename='csstest.css')
-        image = url_for('static',filename='logo1.png')
-        SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
-        json_url = os.path.join(SITE_ROOT, "static", "everything.json")
+		url = url_for('static',filename='csstest.css')
+		image = url_for('static',filename='logo1.png')
+		SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
+		json_url = os.path.join(SITE_ROOT, "static", "everything.json")
 
-        ro = open(json_url, "r")
-        data = json.loads(ro.read())
-        title = "No User Found"
-        result = "The user searched for could not be found. Try clicking their name when you see one of their posts!"
+		ro = open(json_url, "r")
+		data = json.loads(ro.read())
+		title = "No User Found"
+		result = "The user searched for could not be found. Try clicking their name when you see one of their posts!"
 
-        return render_template('template2.html', title = title, result = result, csssheet = url, image = image,user=session.get('CURRENT_USER'))
+		return render_template('template2.html', title = title, result = result, csssheet = url, image = image,user=session.get('CURRENT_USER'))
 
 	else:
 	
@@ -600,6 +600,7 @@ def Updatebio():
 							user1['bio'] = bio1
 							user1['Ppic'] = ppic
 							search = True
+							session['CURRENT_USER'] = user1
 					if search == True:
 						with open(json_url, 'w') as f:
 							json.dump(data, f)		
@@ -619,11 +620,7 @@ def Updatebio():
 			ro = open(json_url, "r")
 			type = 'bio'
 			data = json.loads(ro.read())
-			result=''
-			for user in data["users"]:
-				if user["username"] == name:
-					result = user
-				
+			result = session.get('CURRENT_USER')				
 
 			return render_template('register.html',type=type, csssheet = url, image = image,user = session.get('CURRENT_USER'), result=result)
 
@@ -741,7 +738,7 @@ def Del():
 def Follow():
 	Suser = request.args.get('follow', '')			
 	if not session.get('logged_in'):
-		return login()
+		return redirect('/login/')
 	else:
 		search = False
 		SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
@@ -777,7 +774,7 @@ def Follow():
 def Unfollow():
 	Suser = request.args.get('unfollow', '')			
 	if not session.get('logged_in'):
-		return login()
+		return redirect('/login/')
 	else:
 		search = False
 		SITE_ROOT = os.path.realpath(os.path.dirname(__file__))

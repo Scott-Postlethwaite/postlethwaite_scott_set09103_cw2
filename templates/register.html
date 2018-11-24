@@ -12,7 +12,7 @@
 {% elif type == 'password' %}	 
 	 <h1 class = "center">Change your password</h1>
 {% elif type == 'bio' %}	 
-	 <h1 class = "center">Update your bio</h1>
+	 <h1 class = "center">Update your profile</h1>
 {% endif %} 
  </p>
 
@@ -33,11 +33,9 @@
 <p class="center">Confirm Password:<input type="password" name="password2" placeholder="Password"></textarea><br /></p>
 {% elif type == 'bio' %}
 <p class="center">Bio:</p>
- <textarea name="uplBio" rows="15" cols="100" class="center">{% if type == 'edit' %}{{result['bio']}}{% endif %}</textarea><br />
+ <textarea name="uplBio" rows="15" cols="100" class="center">{% if type == 'bio' %}{{result['bio']}}{% endif %}</textarea><br />
  <p class='center'>Profile Pic:<input type="file" class="center"  name="datafile"/></p>
- {% endif %}
- 
- 
+
  {% endif %}
 <p class="center"> <input type="submit" name="submit" id="submit"/></p>
 </form>

@@ -10,14 +10,15 @@
 	<img src="{{profilePic}}"style="width:200px;height:200px;"/>
 {% endif %}
 	 <h1 class = "center">{{Uname}}</h1>
-	<div class = "center">
+{% if user['username'] == Uname  %}
+	<div><a href='/update/?update={{Uname}}'>Update Profile</a>   <a href='/changepw/?update={{Uname}}'>Change Password</a></div>
+{% endif %}
+	
+<div class = "center">
 	{% autoescape false %}
 		<div>{{bio}}</div>
 		{% endautoescape %}
-			{% if user['username'] == Uname  %}
-			<div><a href='/update/?update={{Uname}}'>Update Profile</a>   <a href='/changepw/?update={{Uname}}'>Change Password</a></div>
-		{% endif %}
-		<div>{{followers}} Followers</div>
+	<div>{{followers}} Followers</div>
 </div>    
 {% if Uname in user['following'] %}
 
