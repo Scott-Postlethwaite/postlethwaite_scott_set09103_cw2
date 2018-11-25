@@ -11,6 +11,7 @@ app.config['static'] = static
 app.config['SECRET_KEY'] = os.urandom(24)
 app.config['SESSION_TYPE'] = 'filesystem'
 
+@app.route("/", methods=['POST','GET'])
 @app.route("/home/", methods=['POST','GET'])
 def home():
 	if request.method == 'POST':
