@@ -26,7 +26,7 @@
 		<div class = "posts">
 		 <h1 class = "center">{{result["name"]}}</h1>
 		{% if result["img"] != '' %}
-			<div><img src="{{result["img"]}}"style="width:380px;height:240px;"/></div>
+			<div class="center"><img src="{{result["img"]}}"style="width:740px;height:480px;"/></div>
 		{% endif %}
 		<div>Subject: <a href='/subject/?subject={{result["subject"]}}'>{{result["subject"]}}</a></div>
 		<div><a href='/user/?user={{result["author"]}}'>{{result["author"]}}</a></div>
@@ -35,6 +35,7 @@
 		{% endautoescape %}
 		</div>
 		<div class = "posts">
+		<p>Comments:</p>
 				{% for comment in result['comments'] %}
 			<div class = "posts">	
 			<div><a href='/user/?user={{comment["author"]}}'>{{comment["author"]}}</a></div>
