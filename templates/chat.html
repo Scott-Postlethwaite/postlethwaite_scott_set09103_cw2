@@ -1,0 +1,40 @@
+<!doctype html>
+
+<body>
+<div>
+
+	<div class = "center">
+	<div id ="notBody">
+{% for x in messages %}
+<div id="notBody">
+<div class = "posts">
+<p class = "message">{{ x }}</p>
+</div></div>
+{% endfor %}
+</div>
+
+<form class = "chattext" method ="POST" >
+    <input type="text" name="chatcontent" placeholder="Enter Message Here...">
+    <input type="submit">
+</form>
+<div id="hiddenMenu">
+	<ul>
+<li id="write"><h3><a href="/home">Home</a></h3> </li>
+		<li id="delete"><h3><a href="/subject">Subjects</a></h3> </li>
+		<li id="edit2"><h3><a href="/following">Following</a></h3> </li>
+		 <li id="edit2"><h3><a href="/all">All</a></h3> </li>
+		 <li id="edit2"><h3><a href="/upload">Post</a></h3> </li>
+		{% if not session.logged_in  %}
+			 <li id="edit2"><h3><a href="/login">Login</a></h3> </li>
+			 <li id="edit2"><h3><a href="/register">Register</a></h3> </li>
+			{% else %}
+				 <li id="edit2"><h3><a href="/logout">Log Out</a></h3> </li>
+		{% endif %}
+
+	</ul>
+	</div>
+	</div>
+</html> 
+	<link rel = "stylesheet" type="text/css" href="{{csssheet}}" >
+
+</html>
