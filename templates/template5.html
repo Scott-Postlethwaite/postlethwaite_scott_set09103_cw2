@@ -10,7 +10,7 @@
 		<div class = "posts">
 		 <h1 class = "center">{{result["name"]}}</h1>
 		{% if result["img"] != '' %}
-		<div class="center"><img src="{{result["img"]}}"style="width:740px;height:480px;"/></div>
+		<div class="center"><img src="{{result["img"]}}"style="max-width: 100%; height: auto; width:auto;"/></div>
 		{% endif %}
 		<div>Subject: <a href='/subject/?subject={{result["subject"]}}'>{{result["subject"]}}</a></div>
 		<div><a href='/user/?user={{result["author"]}}'>{{result["author"]}}</a></div>
